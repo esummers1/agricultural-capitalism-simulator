@@ -1,6 +1,9 @@
 package main;
-
 public class Crop {
+
+    public static final int ID_POTATO = 0;
+    public static final int ID_CARROT = 1;
+    public static final int ID_TURNIP = 2;
     
     private int id;
     private String name;

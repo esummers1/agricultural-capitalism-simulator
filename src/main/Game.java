@@ -8,8 +8,10 @@ public class Game {
     private List<Crop> crops = new ArrayList<>();
     
     public Game() {
-        crops.add(new Crop(0, "Potato", 10, 12, 2, 0.5, 1));
-        crops.add(new Crop(1, "Carrot", 8, 14, 1.5, 0.6, 1));
+        // cost, salePrice, yieldMultiplierWetness, yieldMultiplierHeat, fertility
+        crops.add(new Crop(Crop.ID_POTATO, "Potato", 10, 12, 2  , 0.5, 1));
+        crops.add(new Crop(Crop.ID_CARROT, "Carrot", 8 , 14, 1.5, 0.6, 1));
+        crops.add(new Crop(Crop.ID_TURNIP, "Turnip", 8 , 14, 1.5, 0.6, 1)); // TODO
     }
 
     public void run() {
@@ -20,7 +22,6 @@ public class Game {
         }
     }
     
-    
     private void pollInput() {
         
     }
@@ -28,12 +29,9 @@ public class Game {
     private void doLogic() {
         
     }
+    
     private void render() {
         
     }
-    
-    
-    
-    
 
 }

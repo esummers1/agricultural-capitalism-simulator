@@ -1,0 +1,13 @@
+================================================================================
+To Do
+================================================================================
+
+ - Field class: crop ID, volume
+ - New fields in Game object: money, current year, list of fields
+ - Game logic should generate weather, calculate results and increase current year
+    - yield = (heat * heatFactor) * (wetness * wetnessFactor) * fertility
+    - CONSIDER: This formula actually makes heatFactor and wetnessFactor pointless;
+        they are just multiplied together in this calculation into a single value!
+ - pollInput should prompt user for input until all fields are filled (which crop in field 1... etc)
+ - Ensure the properties of our crops are actually realistic?
+ - Use crop descriptions in-game?
