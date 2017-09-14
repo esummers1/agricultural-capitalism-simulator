@@ -2,15 +2,17 @@
 To Do
 ================================================================================
 
- - Game logic should generate weather, calculate results and increase current year
-    - yield = (heat * heatFactor) * (wetness * wetnessFactor) * fertility
-    - CONSIDER: This formula actually makes heatFactor and wetnessFactor pointless;
-        they are just multiplied together in this calculation into a single value!
-
  - pollInput should prompt user for input until all fields are filled (which crop in field 1... etc)
 
- - Have ability to purchase additional fields - some better than others, e.g. soil quality vs area tradeoff?
-    - Having different areas and no ability to mix crops forces investment tradeoffs
+ - Ability to purchase additional fields
 
  - Ensure the properties of our crops are actually realistic?
+
+================================================================================
+Ideas
+================================================================================
+
  - Use crop descriptions in-game? // this is a great idea, can help tie the crop performance to real life
+ 
+ - Varying field properties, e.g. size / soil quality   // Dan: I like it!
+    - Having different areas and no ability to mix crops forces investment tradeoffs

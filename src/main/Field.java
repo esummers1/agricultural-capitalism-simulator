@@ -2,43 +2,46 @@ package main;
 
 public class Field {
 	
-	private int fieldID;
+	private int fieldId;
 	private String name;
-	private int cropID;
-	private int content;
-	private int area;
+	private Crop crop;
+	private int cropQuantity;
+	private int maxCropQuantity;
+    private double soilQuality;
 	
 	public Field(
-			int fieldID,
-			int cropID,
+			int fieldId,
 			String name,
-			int content,
-			int area) {
-		
-		this.fieldID = fieldID;
-		this.cropID = cropID;
-		this.content = content;
-		this.area = area;
+			int maxCropQuantity,
+			double soilQuality) {
+		this.fieldId = fieldId;
+		this.name = name;
+		this.maxCropQuantity = maxCropQuantity;
+		this.soilQuality = soilQuality;
 	}
 	
-	public int getFieldID() {
-		return fieldID;
+	public int getFieldId() {
+		return fieldId;
 	}
 	
-	public int getCropID() {
-		return cropID;
+	public Crop getCrop() {
+		return crop;
 	}
 	
 	public String getName() {
 		return name;
 	}
 	
-	public int getContent() {
-		return content;
+	public int getCropQuantity() {
+		return cropQuantity;
 	}
 	
-	public int getArea() {
-		return area;
+	public int getMaxCropQuantity() {
+		return maxCropQuantity;
 	}
+	
+	public double getSoilQuality() {
+        return soilQuality;
+    }
 
 }
