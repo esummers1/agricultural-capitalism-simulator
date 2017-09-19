@@ -8,6 +8,10 @@ To Do
 
  - Ensure the properties of our crops are actually realistic?
 
+ - The weather/yield results should be 'remembered' for reporting to player
+
+ - Need to have way of assigning a Field object a Crop object
+
 ================================================================================
 Ideas
 ================================================================================
