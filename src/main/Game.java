@@ -25,9 +25,10 @@ public class Game {
     public Game() {
         
         // cost, salePrice, yieldMultiplierWetness, yieldMultiplierHeat, fertility
-        crops.add(new Crop(Crop.ID_POTATO, "Potato", 10, 12, 2  , 0.5, 1));
-        crops.add(new Crop(Crop.ID_CARROT, "Carrot", 8 , 14, 1.5, 0.6, 1));
-        crops.add(new Crop(Crop.ID_TURNIP, "Turnip", 8 , 14, 1.5, 0.6, 1)); // TODO
+        crops.add(new Crop(Crop.ID_POTATO, "Potato", Crop.DESCRIPTION_POTATO, 10, 12, 2  , 0.5, 1));
+        crops.add(new Crop(Crop.ID_CARROT, "Carrot", Crop.DESCRIPTION_CARROT, 8 , 14, 1.5, 0.6, 1));
+        crops.add(new Crop(Crop.ID_TURNIP, "Turnip", Crop.DESCRIPTION_TURNIP, 8 , 14, 1.5, 0.6, 1));
+        crops.add(new Crop(Crop.ID_WHEAT, "Wheat", Crop.DESCRIPTION_WHEAT, 7, 10, 1.2, 0.8, 1.2)); // TODO
         
         // fieldId, name, maxCropQuantity, soilQuality
         fields.add(new Field(0, "Basic Field", 100, 1.0));
@@ -75,10 +76,38 @@ public class Game {
         
         while (!done) {
             
-            // TODO: print the user's options
-            output("What would you like to do?");
+            output("What would you like to do? Here are your options:\n");
+            output("list - List available crops for purchase");
+            output("status - Give current farm status");
+            output("plant - Buy and plant crops");
+            output("play - Advance to next year's harvest");
+            output("exit - Stop playing");
             
             String input = in.nextLine();
+            
+            // TODO: carry out user's choice
+            
+            if (input.equals("list")) {
+            	listCrops();
+            }
+            
+            /**
+             * Require user to fill all fields. Need to test this logic.
+             * TODO: what if user has spent all their money already?
+             */
+            if (input.equals("play")) {
+            	boolean full = true;
+            	
+            	for (Field field : fields) {
+            		if (field.getCrop() == null) {
+            			full = false;
+            		}
+            	}
+            	
+            	if (full) {
+            		done = true;
+            	}
+            }
             
             if (input.equals("exit")) {
                 exiting = true;
@@ -94,6 +123,20 @@ public class Game {
      */
     private void output(String msg) {
         System.out.println(msg);
+    }
+    
+    /**
+     * List crops that are available for purchase.
+     */
+    private void listCrops() {
+    	output("\n");
+    	
+    	for (Crop crop : crops) {
+    		output(crop.getName() + ": " + crop.getDescription());
+    		output("Buy for: " + crop.getCost() + ", sell for: " + 
+    			crop.getSalePrice());
+    		output("\n");
+    	}
     }
 
     /**

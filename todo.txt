@@ -2,21 +2,19 @@
 To Do
 ================================================================================
 
- - pollInput should prompt user for input until all fields are filled (which crop in field 1... etc)
+ - pollInput results must be completed
 
  - Ability to purchase additional fields
 
- - Ensure the properties of our crops are actually realistic?
-
  - The weather/yield results should be 'remembered' for reporting to player
 
- - Need to have way of assigning a Field object a Crop object
+ - Update/balance crop properties to match descriptions - do some maths to figure realistic yields
+
+ - Balancing of starting capital vs. crop profits
 
 ================================================================================
 Ideas
 ================================================================================
 
- - Use crop descriptions in-game? // this is a great idea, can help tie the crop performance to real life
- 
  - Varying field properties, e.g. size / soil quality   // Dan: I like it!
     - Having different areas and no ability to mix crops forces investment tradeoffs

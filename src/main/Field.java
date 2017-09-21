@@ -20,6 +20,10 @@ public class Field {
 		this.soilQuality = soilQuality;
 	}
 	
+	public void setCrop(Crop crop) {
+		this.crop = crop;
+	}
+	
 	public int getFieldId() {
 		return fieldId;
 	}
