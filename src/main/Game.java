@@ -2,7 +2,6 @@ package main;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,21 +31,23 @@ public class Game {
     private List<Crop> crops = new ArrayList<>();
     
     private boolean exiting;
-    private Scanner in;
+    
+    private Scanner in = new Scanner(System.in);
+    private Log log = new Log();
     
     public Game() {
 
         try {
             crops = readCropData(CROP_DATA_FILENAME);
-        } catch (IOException e) {
+        } catch (JsonIOException |
+                JsonSyntaxException |
+                FileNotFoundException e) {
             e.printStackTrace();
         }
         
         // fieldId, name, maxCropQuantity, soilQuality
         fields.add(new Field(0, "Basic Field", 100, 1.0));
         fields.add(new Field(1, "Lush Field", 50, 1.1));
-        
-        in = new Scanner(System.in);
     }
 
     /**
@@ -73,8 +74,12 @@ public class Game {
         
         while (!exiting){
             pollInput();
-            doLogic();
-            showResults();
+            
+            if (exiting) {
+                break;
+            }
+            
+            processGame();
         }
         
         finish();
@@ -84,6 +89,7 @@ public class Game {
      * Performs any clean-up before exiting the game.
      */
     private void finish() {
+        log.print("Bye!");
         in.close();
     }
 
@@ -91,7 +97,8 @@ public class Game {
      * Explains the game to the user.
      */
     private void introduce() {
-        // TODO
+        log.print("Welcome to Agricultural Capitalism Simulator!");
+        log.newLine();
     }
     
     /**
@@ -99,41 +106,41 @@ public class Game {
      */
     private void pollInput() {
     	
-        boolean done = false;
-        
-        while (!done) {
+        while (true) {
             
-            output("What would you like to do? Here are your options:\n");
-            output("list - List available crops for purchase");
-            output("status - Give current farm status");
-            output("plant - Buy and plant crops");
-            output("play - Advance to next year's harvest");
-            output("exit - Stop playing");
+            log.print("What would you like to do?");
+            log.newLine();
+            log.print("list - List available crops for purchase");
+            log.print("status - Give current farm status");
+            log.print("plant - Buy and plant crops");
+            log.print("play - Advance to next year's harvest");
+            log.print("exit - Stop playing");
+            log.newLine();
             
             String input = in.nextLine();
-            
-            // TODO: carry out user's choice
+            log.newLine();
             
             if (input.equals("list")) {
             	listCrops();
+            	waitForEnter();
+                log.sectionBreak();
+            	continue;
             }
             
-            /**
-             * Require user to fill all fields. Need to test this logic.
-             * TODO: what if user has spent all their money already?
-             */
+            if (input.equals("status")) {
+                reportStatus();
+                waitForEnter();
+                log.sectionBreak();
+                continue;
+            }
+            
+            if (input.equals("plant")) {
+                // TODO
+                continue;
+            }
+            
             if (input.equals("play")) {
-            	boolean full = true;
-            	
-            	for (Field field : fields) {
-            		if (field.getCrop() == null) {
-            			full = false;
-            		}
-            	}
-            	
-            	if (full) {
-            		done = true;
-            	}
+            	break;
             }
             
             if (input.equals("exit")) {
@@ -143,35 +150,57 @@ public class Game {
         }
     }
     
-    /**
-     * Prints the given String to the console.
-     * 
-     * @param msg
-     */
-    private void output(String msg) {
-        System.out.println(msg);
+    private void waitForEnter() {
+        log.print("Press ENTER to continue.");
+        in.nextLine();
     }
     
     /**
      * List crops that are available for purchase.
      */
     private void listCrops() {
-    	output("\n");
-    	
     	for (Crop crop : crops) {
-    		output(crop.getName() + ": " + crop.getDescription());
-    		output("Buy for: " + crop.getCost() + ", sell for: " + 
-    			crop.getSalePrice());
-    		output("\n");
+    		log.print(crop.getName());
+    		log.print(crop.getDescription());
+    		log.print("Cost: " + crop.getCost());
+    		log.print("Sale Price: " + crop.getSalePrice());
+    		log.newLine();
     	}
+    }
+    
+    private void reportStatus() {
+        
+        log.print("Year: " + year);
+        log.print("Balance: " + money);
+        log.newLine();
+        
+        log.print("Fields:");
+        
+        for (Field field: fields) {
+            
+            Crop crop = field.getCrop();
+            
+            if (crop == null) {
+                log.print(field.getName() + " is empty!");
+            } else {
+                log.print(field.getName() + " - " +
+                        crop.getName() + " (" +
+                        field.getCropQuantity() + " / " +
+                        field.getMaxCropQuantity() + ")");
+            }
+        }
+
+        log.newLine();
     }
 
     /**
      * Performs the end-of-round logic.
      */
-    private void doLogic() {
-        money += calculateProfit(generateWetness(), generateHeat());
+    private void processGame() {
+        long profit = calculateProfit(generateWetness(), generateHeat());
+        money += profit;
         year++;
+        showResults(profit);
     }
 
     /**
@@ -227,9 +256,16 @@ public class Game {
     
     /**
      * Displays the results of the round and the current state of the game.
+     * @param profit 
      */
-    private void showResults() {
-    	// TODO
+    private void showResults(long profit) {
+        if (profit > 0) {
+            log.print("You made a profit of " + profit + "!");
+        } else if (profit == 0) {
+            log.print("You broke even!");
+        } else {
+            log.print("You made a loss of " + profit + "!");
+        }
     }
 
 }
