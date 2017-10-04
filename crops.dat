@@ -1,0 +1,42 @@
+[
+  {
+    "id": 0,
+    "name": "Potato",
+    "description": "Tuber of the Nightshade family which prefers a cool, wet climate. Considered a staple food of many nations due to its starch content.",
+    "cost": 10,
+    "salePrice": 12,
+    "yieldMultiplierWetness": 2.0,
+    "yieldMultiplierHeat": 0.5,
+    "fertility": 1.0
+  },
+  {
+    "id": 1,
+    "name": "Carrot",
+    "description": "Nutritious root vegetable of the Carrot family, cheap to grow and thriving in sunny weather.",
+    "cost": 8,
+    "salePrice": 14,
+    "yieldMultiplierWetness": 1.5,
+    "yieldMultiplierHeat": 0.6,
+    "fertility": 1.0
+  },
+  {
+    "id": 2,
+    "name": "Turnip",
+    "description": "Tasty root vegetable of the Cabbage family, benefiting from high yields but suffering in hot climates.",
+    "cost": 8,
+    "salePrice": 14,
+    "yieldMultiplierWetness": 1.5,
+    "yieldMultiplierHeat": 0.6,
+    "fertility": 1.0
+  },
+  {
+    "id": 3,
+    "name": "Wheat",
+    "description": "Grain of the Grass family grown worldwide as a staple food due to its high protein content. Produces large yields and is weather-resistant,  but requires large plantings to be profitable.",
+    "cost": 7,
+    "salePrice": 10,
+    "yieldMultiplierWetness": 1.2,
+    "yieldMultiplierHeat": 0.8,
+    "fertility": 1.2
+  }
+]

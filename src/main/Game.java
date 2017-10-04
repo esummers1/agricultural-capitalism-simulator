@@ -1,11 +1,23 @@
 package main;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+
 public class Game {
     
+    private static final String CROP_DATA_FILENAME = "crops.dat";
+
     /**
      * The player's current balance.
      */
@@ -23,18 +35,33 @@ public class Game {
     private Scanner in;
     
     public Game() {
-        
-        // cost, salePrice, yieldMultiplierWetness, yieldMultiplierHeat, fertility
-        crops.add(new Crop(Crop.ID_POTATO, "Potato", Crop.DESCRIPTION_POTATO, 10, 12, 2  , 0.5, 1));
-        crops.add(new Crop(Crop.ID_CARROT, "Carrot", Crop.DESCRIPTION_CARROT, 8 , 14, 1.5, 0.6, 1));
-        crops.add(new Crop(Crop.ID_TURNIP, "Turnip", Crop.DESCRIPTION_TURNIP, 8 , 14, 1.5, 0.6, 1));
-        crops.add(new Crop(Crop.ID_WHEAT, "Wheat", Crop.DESCRIPTION_WHEAT, 7, 10, 1.2, 0.8, 1.2)); // TODO
+
+        try {
+            crops = readCropData(CROP_DATA_FILENAME);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         
         // fieldId, name, maxCropQuantity, soilQuality
         fields.add(new Field(0, "Basic Field", 100, 1.0));
         fields.add(new Field(1, "Lush Field", 50, 1.1));
         
         in = new Scanner(System.in);
+    }
+
+    /**
+     * Reads the crop data from the given file.
+     * @return
+     * @throws JsonIOException
+     * @throws JsonSyntaxException
+     * @throws FileNotFoundException
+     */
+    private List<Crop> readCropData(String filename) 
+            throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Crop>>(){}.getType();
+        return gson.fromJson(new JsonReader(
+                new FileReader(filename)), type);
     }
 
     /**
