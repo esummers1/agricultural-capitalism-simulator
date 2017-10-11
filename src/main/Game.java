@@ -6,6 +6,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
@@ -135,7 +137,7 @@ public class Game {
             }
             
             if (input.equals("plant")) {
-                // TODO
+                plant();
                 continue;
             }
             
@@ -148,6 +150,68 @@ public class Game {
                 break;
             }
         }
+    }
+    
+    private void plant() {
+        
+        log.print("Your available fields:");
+        
+        List<Field> emptyFields = fields.stream()
+                .filter(f -> f.isEmpty())
+                .collect(Collectors.toList());
+        
+        for (int i = 0; i < emptyFields.size(); i++) {
+            log.print((i + 1) + ") " + emptyFields.get(i).getName());
+        }
+        
+        log.newLine();
+        log.print("Which field would you like to plant in?");
+        
+        int fieldChoice = -1;
+        while (fieldChoice < 0 || fieldChoice >= emptyFields.size()) {
+            fieldChoice = in.nextInt() - 1;
+        }
+        
+        log.newLine();
+        log.print("Available crops for planting:");
+        
+        for (int i = 0; i < crops.size(); i++) {
+            log.print((i + 1) + ") " + crops.get(i).getName());
+        }
+        
+        log.newLine();
+        log.print("Which crop would you like to plant?");
+        
+        int cropChoice = -1;
+        while (cropChoice < 0 || cropChoice >= crops.size()) {
+            cropChoice = in.nextInt() - 1;
+        }
+        
+        Field field = emptyFields.get(fieldChoice);
+        Crop crop = crops.get(cropChoice);
+        
+        // Can't exceed field capacity or spend more money than we have
+        int maxVolume = Math.min(
+                field.getMaxCropQuantity(),
+                (int) (money / crop.getCost()));
+        
+        log.newLine();
+        log.print("How many units would you like to purchase (maximum " 
+                + maxVolume + ")?");
+
+        int quantity = -1;
+        while (quantity < 0 || quantity > maxVolume) {
+            quantity = in.nextInt();
+        }
+        
+        if (quantity == 0) {
+            return;
+        }
+        
+        field.setCrop(crop);
+        field.setCropQuantity(quantity);
+        
+        money -= quantity * crop.getCost();
     }
     
     private void waitForEnter() {
@@ -197,10 +261,19 @@ public class Game {
      * Performs the end-of-round logic.
      */
     private void processGame() {
-        long profit = calculateProfit(generateWetness(), generateHeat());
+        
+        double wetness = generateWetness();
+        double heat = generateHeat();
+        long profit = calculateProfit(wetness, heat);
+        
         money += profit;
         year++;
-        showResults(profit);
+        
+        showResults(wetness, heat, profit);
+        
+        for (Field field : fields) {
+            field.clear();
+        }
     }
 
     /**
@@ -209,7 +282,7 @@ public class Game {
      * @return
      */
     private double generateWetness() {
-        return Math.random(); // 0-1 (for now)
+        return ThreadLocalRandom.current().nextDouble(0.75, 1.25);
     }
 
     /**
@@ -218,7 +291,7 @@ public class Game {
      * @return
      */
     private double generateHeat() {
-        return Math.random(); // 0-1 (for now)
+        return ThreadLocalRandom.current().nextDouble(0.75, 1.25);
     }
 
     /**
@@ -248,7 +321,8 @@ public class Game {
             double yield = 
                     ((heatFactor + wetnessFactor) / 2) * crop.getFertility();
             
-            profit += yield * crop.getSalePrice() * field.getSoilQuality();
+            profit += yield * field.getCropQuantity() * 
+                    crop.getSalePrice() * field.getSoilQuality();
         }
         
         return profit;
@@ -256,9 +330,15 @@ public class Game {
     
     /**
      * Displays the results of the round and the current state of the game.
+     * @param heat 
+     * @param wetness 
      * @param profit 
      */
-    private void showResults(long profit) {
+    private void showResults(double wetness, double heat, long profit) {
+        
+        log.print("Wetness: " + wetness);
+        log.print("Heat: " + heat);
+        
         if (profit > 0) {
             log.print("You made a profit of " + profit + "!");
         } else if (profit == 0) {

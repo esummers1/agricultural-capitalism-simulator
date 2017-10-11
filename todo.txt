@@ -2,19 +2,13 @@
 To Do
 ================================================================================
 
- - pollInput results must be completed
-
  - Ability to purchase additional fields
-
- - The weather/yield results should be 'remembered' for reporting to player
-
- - Update/balance crop properties to match descriptions - do some maths to figure realistic yields
-
- - Balancing of starting capital vs. crop profits
-
-================================================================================
-Ideas
-================================================================================
-
- - Varying field properties, e.g. size / soil quality   // Dan: I like it!
-    - Having different areas and no ability to mix crops forces investment tradeoffs
+ - Display weather / heat nicely
+ - Randomise weather / heat using a bell curve
+ - Improve formatting (line breaks, etc)
+ - Balance crops
+ - Adding more crops
+ - (once fields can be purchased) adding field types
+ - Endgame condition (bankrupt -> game over; score evaluation e.g. after 10 yrs)
+ - Report net profit, not gross
+ - Unit tests

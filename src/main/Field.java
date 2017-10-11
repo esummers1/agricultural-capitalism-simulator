@@ -48,4 +48,17 @@ public class Field {
         return soilQuality;
     }
 
+	public boolean isEmpty() {
+	    return crop == null;
+	}
+	
+	public void setCropQuantity(int cropQuantity) {
+        this.cropQuantity = cropQuantity;
+    }
+
+    public void clear() {
+        crop = null;
+        cropQuantity = 0;
+    }
+	
 }
