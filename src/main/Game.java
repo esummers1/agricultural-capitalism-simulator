@@ -18,7 +18,8 @@ import com.google.gson.stream.JsonReader;
 public class Game {
     
     private static final String CROP_DATA_FILENAME = "crops.dat";
-
+    private static final String FIELD_DATA_FILENAME = "fields.dat";
+    
     /**
      * The player's current balance.
      */
@@ -30,12 +31,19 @@ public class Game {
 	private long expenditure = 0;
 	
 	/**
+	 * The player's assets acquired this year (for reporting).
+	 */
+	private long newAssets = 0;
+	
+	/**
 	 * The current year.
 	 */
 	private int year = 1;
 	
-	private List<Field> fields = new ArrayList<>();
+	private List<Field> allFields = new ArrayList<>();
     private List<Crop> crops = new ArrayList<>();
+    
+    private List<Field> playerFields = new ArrayList<>();
     
     private boolean exiting;
     
@@ -52,9 +60,22 @@ public class Game {
             e.printStackTrace();
         }
         
-        // fieldId, name, maxCropQuantity, soilQuality
-        fields.add(new Field(0, "Basic Field", 100, 1.0));
-        fields.add(new Field(1, "Lush Field", 50, 1.1));
+        try {
+        	allFields = readFieldData(FIELD_DATA_FILENAME);
+        } catch (JsonIOException |
+        		JsonSyntaxException |
+        		FileNotFoundException e) {
+        	e.printStackTrace();
+        }
+        
+        // Give player initial fields
+        playerFields.add(allFields.get(0));
+        playerFields.add(allFields.get(1));
+        
+        // Mark player's fields owned in list of all fields
+        allFields.get(0).setOwned(true);
+        allFields.get(1).setOwned(true);
+        
     }
 
     /**
@@ -71,6 +92,22 @@ public class Game {
         return gson.fromJson(new JsonReader(
                 new FileReader(filename)), type);
     }
+    
+    /**
+     * Reads the field data from the given file.
+     * @param filename
+     * @return
+     * @throws JsonIOException
+     * @throws JsonSyntaxException
+     * @throws FileNotFoundException
+     */
+    private List<Field> readFieldData(String filename)
+    		throws JsonIOException, JsonSyntaxException, FileNotFoundException {
+    	Gson gson = new Gson();
+    	Type type = new TypeToken<List<Field>>(){}.getType();
+    	return gson.fromJson(new JsonReader(
+    			new FileReader(filename)), type);
+    }
 
     /**
      * The game loop.
@@ -80,7 +117,14 @@ public class Game {
         introduce();
         
         while (!exiting){
-            pollInput();
+        	
+            if (money < 1) {
+            	log.print("You are bankrupt. You will have to find a job.");
+            	log.newLine();
+            	break;
+            }
+        	
+        	pollInput();
             
             if (exiting) {
                 break;
@@ -120,8 +164,9 @@ public class Game {
             log.print("1) List available crops for purchase");
             log.print("2) Give current farm status");
             log.print("3) Buy and plant crops");
-            log.print("4) Advance to next year's harvest");
-            log.print("5) Stop playing");
+            log.print("4) Purchase new fields");
+            log.print("5) Advance to next year's harvest");
+            log.print("6) Stop playing");
             log.newLine();
             
             int input = 0;
@@ -153,10 +198,14 @@ public class Game {
             }
             
             if (input == 4) {
-            	break;
+            	buyFields();
             }
             
             if (input == 5) {
+            	break;
+            }
+            
+            if (input == 6) {
                 exiting = true;
                 break;
             }
@@ -164,12 +213,20 @@ public class Game {
     }
     
     private void plant() {
-        
-        log.print("Your available fields:");
-        
-        List<Field> emptyFields = fields.stream()
+                
+        List<Field> emptyFields = playerFields.stream()
                 .filter(f -> f.isEmpty())
                 .collect(Collectors.toList());
+        
+        // Return to menu if no fields have available space
+        if (emptyFields.size() == 0) {
+        	log.print("Your fields are fully planted.");
+        	log.newLine();
+        	waitForEnter();
+        	return;
+        } 
+        
+        log.print("Your available fields:");
         
         for (int i = 0; i < emptyFields.size(); i++) {
             log.print((i + 1) + ") " + emptyFields.get(i).getName());
@@ -218,6 +275,7 @@ public class Game {
         log.newLine();
         
         if (quantity == 0) {
+        	waitForEnter();
             return;
         }
         
@@ -226,6 +284,72 @@ public class Game {
         
         money -= quantity * crop.getCost();
         expenditure += quantity * crop.getCost();
+    }
+    
+    /**
+     * Allow player to buy new fields
+     */
+    private void buyFields() {
+    	
+    	// Get list of fields that are not owned by player
+    	List<Field> availableFields = allFields.stream()
+    			.filter(f -> f.isNotOwned())
+    			.collect(Collectors.toList());
+    	
+    	// If there are no fields available, return player to menu
+    	if (availableFields.size() == 0) {
+    		log.print("There are no fields remaining for purchase!");
+    		log.newLine();
+    		waitForEnter();
+    		return;
+    	}
+    	
+    	log.print("Here are the available fields for purchase: ");
+    	log.newLine();
+    	
+    	for (int i = 0; i < availableFields.size(); i++) {
+    		log.print((i + 1) + ") " + availableFields.get(i).getName() + ", "
+    				+ availableFields.get(i).getDescription());
+    		log.print("Price: " + availableFields.get(i).getPrice());
+    		log.newLine();
+    	}
+    	
+    	log.print("Which field would you like to purchase? Enter " +
+    			(availableFields.size() + 1) + " to return to menu.");
+    	
+    	int fieldChoice = -1;
+    	while (fieldChoice < 0 || fieldChoice >= availableFields.size()) {
+    		fieldChoice = in.nextInt() - 1;
+    		
+    		// If player has selected the return command, return to menu
+        	if (fieldChoice == availableFields.size()) {
+        		log.newLine();
+        		waitForEnter();
+        		return;
+        	}
+    	}
+    	
+    	if (availableFields.get(fieldChoice).getPrice() > money) {
+    		log.print("Sorry, you have insufficient funds.");
+    		log.newLine();
+    		waitForEnter();
+    		return;
+    	} else {
+    		
+    		// Add to player's fields, mark it owned, deduct money
+    		playerFields.add(availableFields.get(fieldChoice));
+    		allFields.get(availableFields.get(fieldChoice).getFieldId())
+    			.setOwned(true);
+    		
+    		long price = availableFields.get(fieldChoice).getPrice();
+    		
+    		money -= price;
+    		expenditure += price;
+    		newAssets += price;
+    	}
+    	
+    	log.newLine();
+    	
     }
     
     private void waitForEnter() {
@@ -238,7 +362,7 @@ public class Game {
      */
     private void listCrops() {
     	for (Crop crop : crops) {
-    		log.print(crop.getName());
+    		log.print("**" + crop.getName());
     		log.print(crop.getDescription());
     		log.print("Cost: " + crop.getCost());
     		log.print("Sale Price: " + crop.getSalePrice());
@@ -250,19 +374,23 @@ public class Game {
         
         log.print("Year: " + year);
         log.print("Balance: " + money);
+        log.print("Asset value: " + calculateAssets());
+        
         log.newLine();
         
         log.print("Fields:");
         
-        for (Field field: fields) {
+        for (Field field: playerFields) {
             
             Crop crop = field.getCrop();
             
             if (crop == null) {
-                log.print(field.getName() + " is empty!");
+                log.print(field.getName() + ", value " + 
+                		field.getPrice() + ", is empty!");
             } else {
-                log.print(field.getName() + " - " +
-                        crop.getName() + " (" +
+                log.print(field.getName() + ", value " + 
+                		field.getPrice() + " - " + 
+                		crop.getName() + " (" +
                         field.getCropQuantity() + " / " +
                         field.getMaxCropQuantity() + ")");
             }
@@ -285,7 +413,7 @@ public class Game {
         
         showResults(wetness, heat, profit);
         
-        for (Field field : fields) {
+        for (Field field : playerFields) {
             field.clear();
         }
     }
@@ -319,7 +447,7 @@ public class Game {
     	
         long profit = 0;
         
-        for (Field field : fields) {
+        for (Field field : playerFields) {
             
             Crop crop = field.getCrop();
             
@@ -340,6 +468,22 @@ public class Game {
         }
         
         return profit;
+    }
+    
+    /**
+     * Return the total value of the player's assets
+     * @return
+     */
+    private long calculateAssets() {
+    	
+    	int assets = 0;
+    	
+    	for (Field field : playerFields) {
+    		assets += field.getPrice();
+    	}
+    	
+    	return assets;
+    	
     }
     
     /**
@@ -383,25 +527,31 @@ public class Game {
      */
     private void showResults(double wetness, double heat, long profit) {
         
-    	long netProfit = profit - expenditure;
-    	
     	log.sectionBreak();
     	reportWeather(wetness, heat);
     	log.newLine();
+    	    	
+    	long netProfit = profit + newAssets - expenditure;
     	
     	log.print("Year " + (year - 1) + " performance:");
-    	log.print("Total revenue: " + profit);
-    	log.print("Total expenses: " + expenditure);
+    	log.print("Asset acquisitions: " + newAssets);
+    	log.print("Revenue: " + profit);
+    	log.print("Expenses: " + expenditure);
     	log.print("---------------------");
     	
         if (netProfit > 0) {
             log.print("Congratulations! You made a net profit of " + netProfit + ".");
         } else if (netProfit == 0) {
-            log.print("It could be worse: you broke even.");
+            log.print("It could be worse; you broke even.");
         } else {
             log.print("Commiserations! You made a loss of " + netProfit + ".");
         }
         
+        expenditure = 0;
+        newAssets = 0;
+        
+        log.print("Year end balance: " + money);
+        log.print("Total asset value: " + calculateAssets());
         log.sectionBreak();
         log.newLine();
                 

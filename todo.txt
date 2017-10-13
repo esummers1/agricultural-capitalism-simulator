@@ -2,13 +2,14 @@
 To Do
 ================================================================================
 
- - Ability to purchase additional fields
  - Randomise weather / heat using a bell curve
    - Revise reportWeather bounds once done
  - Balance crops
  - Adding more crops
- - (once fields can be purchased) adding field types
- - Endgame condition (bankrupt -> game over; score evaluation e.g. after 10 yrs)
+ - Endgame condition e.g. score evaluation after 10 years
  - Unit tests
  - Handle user inputting strings when program expects an integer
- - [Issue] Press ENTER to continue seems not to be waiting for ENTER?
+ - [Issue] waitForEnter seems not to be waiting for ENTER?
+ - Add ability to sell fields, as a cash injection
+ - Perhaps make a method similar to waitForEnter which includes a return line,
+    for returning to menu?

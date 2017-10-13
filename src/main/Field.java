@@ -4,20 +4,27 @@ public class Field {
 	
 	private int fieldId;
 	private String name;
+	private String description;
 	private Crop crop;
 	private int cropQuantity;
 	private int maxCropQuantity;
     private double soilQuality;
+    private long price;
+    private boolean owned = false;
 	
 	public Field(
 			int fieldId,
 			String name,
+			String description,
 			int maxCropQuantity,
-			double soilQuality) {
+			double soilQuality,
+			long price) {
 		this.fieldId = fieldId;
 		this.name = name;
+		this.description = description;
 		this.maxCropQuantity = maxCropQuantity;
 		this.soilQuality = soilQuality;
+		this.price = price;
 	}
 	
 	public void setCrop(Crop crop) {
@@ -36,6 +43,10 @@ public class Field {
 		return name;
 	}
 	
+	public String getDescription() {
+		return description;
+	}
+	
 	public int getCropQuantity() {
 		return cropQuantity;
 	}
@@ -47,14 +58,26 @@ public class Field {
 	public double getSoilQuality() {
         return soilQuality;
     }
+	
+	public long getPrice() {
+		return price;
+	}
 
 	public boolean isEmpty() {
 	    return crop == null;
 	}
 	
+	public boolean isNotOwned() {
+		return !owned;
+	}
+	
 	public void setCropQuantity(int cropQuantity) {
         this.cropQuantity = cropQuantity;
     }
+	
+	public void setOwned(boolean owned) {
+		this.owned = owned;
+	}
 
     public void clear() {
         crop = null;
