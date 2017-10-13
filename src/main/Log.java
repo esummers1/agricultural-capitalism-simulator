@@ -23,7 +23,14 @@ public class Log {
     
     public void sectionBreak() {
         print(SECTION_BREAK);
-        newLine();
+    }
+    
+    /**
+     * Prints the given String to the console without a line break.
+     * @param msg
+     */
+    public void printSame(String msg) {
+    	System.out.printf(msg);
     }
     
 }

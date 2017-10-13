@@ -25,6 +25,11 @@ public class Game {
 	private long money = 1000;
 	
 	/**
+	 * The player's yearly expenses.
+	 */
+	private long expenditure = 0;
+	
+	/**
 	 * The current year.
 	 */
 	private int year = 1;
@@ -112,40 +117,46 @@ public class Game {
             
             log.print("What would you like to do?");
             log.newLine();
-            log.print("list - List available crops for purchase");
-            log.print("status - Give current farm status");
-            log.print("plant - Buy and plant crops");
-            log.print("play - Advance to next year's harvest");
-            log.print("exit - Stop playing");
+            log.print("1) List available crops for purchase");
+            log.print("2) Give current farm status");
+            log.print("3) Buy and plant crops");
+            log.print("4) Advance to next year's harvest");
+            log.print("5) Stop playing");
             log.newLine();
             
-            String input = in.nextLine();
+            int input = 0;
+            while (input < 1 || input > 5) {
+            	input = in.nextInt();
+            }
+            
             log.newLine();
             
-            if (input.equals("list")) {
+            if (input == 1) {
             	listCrops();
             	waitForEnter();
                 log.sectionBreak();
+                log.newLine();
             	continue;
             }
             
-            if (input.equals("status")) {
+            if (input == 2) {
                 reportStatus();
                 waitForEnter();
                 log.sectionBreak();
+                log.newLine();
                 continue;
             }
             
-            if (input.equals("plant")) {
+            if (input == 3) {
                 plant();
                 continue;
             }
             
-            if (input.equals("play")) {
+            if (input == 4) {
             	break;
             }
             
-            if (input.equals("exit")) {
+            if (input == 5) {
                 exiting = true;
                 break;
             }
@@ -204,6 +215,8 @@ public class Game {
             quantity = in.nextInt();
         }
         
+        log.newLine();
+        
         if (quantity == 0) {
             return;
         }
@@ -212,6 +225,7 @@ public class Game {
         field.setCropQuantity(quantity);
         
         money -= quantity * crop.getCost();
+        expenditure += quantity * crop.getCost();
     }
     
     private void waitForEnter() {
@@ -329,6 +343,39 @@ public class Game {
     }
     
     /**
+     * Reports the year's weather in plain English
+     * TODO: revise this once 
+     * @param wetness
+     * @param heat
+     */
+    private void reportWeather(double wetness, double heat) {
+    	
+    	double lowerBound = 0.9;
+    	double upperBound = 1.1;
+    	    	
+    	String report;
+    	
+    	if (heat < lowerBound) {
+    		report = "This was a frigid year ";
+    	} else if (heat > upperBound) {
+    		report = "This was a scorching year ";
+    	} else {
+    		report = "This was a temperate year ";
+    	}
+    	
+    	if (wetness < lowerBound) {
+    		report = report + "with little precipitation.";
+    	} else if (wetness > upperBound) {
+    		report = report + "with torrential downpours.";
+    	} else {
+    		report = report + "with modest rainfall.";
+    	}
+    	
+    	log.print(report);
+    	
+    }
+    
+    /**
      * Displays the results of the round and the current state of the game.
      * @param heat 
      * @param wetness 
@@ -336,16 +383,28 @@ public class Game {
      */
     private void showResults(double wetness, double heat, long profit) {
         
-        log.print("Wetness: " + wetness);
-        log.print("Heat: " + heat);
-        
-        if (profit > 0) {
-            log.print("You made a profit of " + profit + "!");
-        } else if (profit == 0) {
-            log.print("You broke even!");
+    	long netProfit = profit - expenditure;
+    	
+    	log.sectionBreak();
+    	reportWeather(wetness, heat);
+    	log.newLine();
+    	
+    	log.print("Year " + (year - 1) + " performance:");
+    	log.print("Total revenue: " + profit);
+    	log.print("Total expenses: " + expenditure);
+    	log.print("---------------------");
+    	
+        if (netProfit > 0) {
+            log.print("Congratulations! You made a net profit of " + netProfit + ".");
+        } else if (netProfit == 0) {
+            log.print("It could be worse: you broke even.");
         } else {
-            log.print("You made a loss of " + profit + "!");
+            log.print("Commiserations! You made a loss of " + netProfit + ".");
         }
+        
+        log.sectionBreak();
+        log.newLine();
+                
     }
 
 }

@@ -60,5 +60,10 @@ public class Field {
         crop = null;
         cropQuantity = 0;
     }
+    
+    @Override
+    public String toString() {
+    	return name;
+    }
 	
 }
