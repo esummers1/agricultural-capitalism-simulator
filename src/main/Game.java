@@ -80,6 +80,8 @@ public class Game {
 
     /**
      * Reads the crop data from the given file.
+     * 
+     * @param filename
      * @return
      * @throws JsonIOException
      * @throws JsonSyntaxException
@@ -95,6 +97,7 @@ public class Game {
     
     /**
      * Reads the field data from the given file.
+     * 
      * @param filename
      * @return
      * @throws JsonIOException
@@ -118,6 +121,10 @@ public class Game {
         
         while (!exiting){
         	
+        	/**
+        	 * End game if player has no remaining funds.
+        	 * TODO: revise this once the player can e.g. sell assets
+        	 */
             if (money < 1) {
             	log.print("You are bankrupt. You will have to find a job.");
             	log.newLine();
@@ -145,7 +152,7 @@ public class Game {
     }
 
     /**
-     * Explains the game to the user.
+     * Explains the game to the player.
      */
     private void introduce() {
         log.print("Welcome to Agricultural Capitalism Simulator!");
@@ -153,7 +160,7 @@ public class Game {
     }
     
     /**
-     * Prompts the user for all necessary input for the round.
+     * Prompts the player for all necessary input for the round.
      */
     private void pollInput() {
     	
@@ -199,6 +206,7 @@ public class Game {
             
             if (input == 4) {
             	buyFields();
+            	continue;
             }
             
             if (input == 5) {
@@ -212,6 +220,9 @@ public class Game {
         }
     }
     
+    /**
+     * Allow player to purchase and plant crops in available fields.
+     */
     private void plant() {
                 
         List<Field> emptyFields = playerFields.stream()
@@ -304,7 +315,7 @@ public class Game {
     		return;
     	}
     	
-    	log.print("Here are the available fields for purchase: ");
+    	log.print("Here are the fields available for purchase: ");
     	log.newLine();
     	
     	for (int i = 0; i < availableFields.size(); i++) {
@@ -352,6 +363,9 @@ public class Game {
     	
     }
     
+    /**
+     * Wait for a prompt before returning to menu.
+     */
     private void waitForEnter() {
         log.print("Press ENTER to continue.");
         in.nextLine();
@@ -370,6 +384,9 @@ public class Game {
     	}
     }
     
+    /**
+     * Report farm status to player.
+     */
     private void reportStatus() {
         
         log.print("Year: " + year);
@@ -471,7 +488,8 @@ public class Game {
     }
     
     /**
-     * Return the total value of the player's assets
+     * Return the total value of the player's assets.
+     * 
      * @return
      */
     private long calculateAssets() {
@@ -487,8 +505,9 @@ public class Game {
     }
     
     /**
-     * Reports the year's weather in plain English
-     * TODO: revise this once 
+     * Report the year's weather in plain English.
+     * TODO: revise this once weather calculation is improved
+     * 
      * @param wetness
      * @param heat
      */
@@ -521,6 +540,7 @@ public class Game {
     
     /**
      * Displays the results of the round and the current state of the game.
+     * 
      * @param heat 
      * @param wetness 
      * @param profit 
