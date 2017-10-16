@@ -2,14 +2,18 @@
 To Do
 ================================================================================
 
- - Randomise weather / heat using a bell curve
-   - Revise reportWeather bounds once done
- - Balance crops
- - Adding more crops
  - Endgame condition e.g. score evaluation after 10 years
- - Unit tests
  - Handle user inputting strings when program expects an integer
- - [Issue] waitForEnter seems not to be waiting for ENTER?
- - Add ability to sell fields, as a cash injection
+ - Add ability to sell fields, as a cash injection?
  - Perhaps make a method similar to waitForEnter which includes a return line,
     for returning to menu?
+
+ - Revise crop yield algorithm - perhaps factor sun in, too?
+  - Currently both factors are additive - is suboptimal for e.g. crops which
+    are sensitive to rain
+
+ - Balance crops
+ - Adding more crops
+
+ - [Issue] waitForEnter seems not to be waiting for ENTER?
+ - Unit tests

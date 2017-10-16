@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -49,6 +50,7 @@ public class Game {
     
     private Scanner in = new Scanner(System.in);
     private Log log = new Log();
+    private Random rand = new Random();
     
     public Game() {
 
@@ -77,7 +79,7 @@ public class Game {
         allFields.get(1).setOwned(true);
         
     }
-
+    
     /**
      * Reads the crop data from the given file.
      * 
@@ -111,7 +113,7 @@ public class Game {
     	return gson.fromJson(new JsonReader(
     			new FileReader(filename)), type);
     }
-
+    
     /**
      * The game loop.
      */
@@ -150,7 +152,7 @@ public class Game {
         log.print("Bye!");
         in.close();
     }
-
+    
     /**
      * Explains the game to the player.
      */
@@ -415,7 +417,7 @@ public class Game {
 
         log.newLine();
     }
-
+    
     /**
      * Performs the end-of-round logic.
      */
@@ -434,25 +436,39 @@ public class Game {
             field.clear();
         }
     }
-
+    
     /**
      * Generates a random value for wetness.
+     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
      * 
      * @return
      */
     private double generateWetness() {
-        return ThreadLocalRandom.current().nextDouble(0.75, 1.25);
+    	double wetness = 0;
+    	
+    	while (wetness < 0.7 || wetness > 1.3) {
+    		wetness = (rand.nextGaussian() * 0.1 + 1);
+    	}
+    	
+    	return wetness;
     }
-
+    
     /**
      * Generates a random value for heat.
+     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
      * 
      * @return
      */
     private double generateHeat() {
-        return ThreadLocalRandom.current().nextDouble(0.75, 1.25);
+    	double heat = 0;
+    	
+    	while (heat < 0.7 || heat > 1.3) {
+    		heat = (rand.nextGaussian() * 0.1 + 1);
+    	}
+    	
+    	return heat;
     }
-
+    
     /**
      * Determines the profit for the round.
      * 
@@ -506,7 +522,7 @@ public class Game {
     
     /**
      * Report the year's weather in plain English.
-     * TODO: revise this once weather calculation is improved
+     * Non-average weather reports come at 1 stdev from mean.
      * 
      * @param wetness
      * @param heat
