@@ -6,8 +6,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
@@ -16,67 +14,80 @@ import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
+import actions.Action;
+import actions.BuyCropsAction;
+import actions.BuyFieldsAction;
+import actions.ExitAction;
+import actions.ListCropsAction;
+import actions.PlayAction;
+import actions.StatusAction;
+
 public class Game {
     
     private static final String CROP_DATA_FILENAME = "crops.dat";
     private static final String FIELD_DATA_FILENAME = "fields.dat";
+
+    private static final double WEATHER_LOW_BOUND = 0.9;
+    private static final double WEATHER_UPPER_BOUND = 1.1;
+
+    /*
+     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
+     */
+    private static final double WETNESS_DEVIATION = 0.1;
+    private static final double MIN_WETNESS = 1 - 3 * WETNESS_DEVIATION;
+    private static final double MAX_WETNESS = 1 + 3 * WETNESS_DEVIATION;
+
+    /*
+     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
+     */
+    private static final double HEAT_DEVIATION = 0.1;
+    private static final double MIN_HEAT = 1 - 3 * HEAT_DEVIATION;
+    private static final double MAX_HEAT = 1 + 3 * HEAT_DEVIATION;
     
     /**
      * The player's current balance.
      */
-	private long money = 1000;
+	private int money = 1000;
 	
 	/**
 	 * The player's yearly expenses.
 	 */
-	private long expenditure = 0;
+	private int expenditure = 0;
 	
 	/**
 	 * The player's assets acquired this year (for reporting).
 	 */
-	private long newAssets = 0;
+	private int newAssets = 0;
 	
 	/**
 	 * The current year.
 	 */
 	private int year = 1;
 	
-	private List<Field> allFields = new ArrayList<>();
+	private List<Field> availableFields = new ArrayList<>();
     private List<Crop> crops = new ArrayList<>();
     
     private List<Field> playerFields = new ArrayList<>();
     
     private boolean exiting;
     
-    private Scanner in = new Scanner(System.in);
-    private Log log = new Log();
+    private Console console = new Console();
     private Random rand = new Random();
     
     public Game() {
 
         try {
             crops = readCropData(CROP_DATA_FILENAME);
+            availableFields = readFieldData(FIELD_DATA_FILENAME);
         } catch (JsonIOException |
                 JsonSyntaxException |
                 FileNotFoundException e) {
             e.printStackTrace();
         }
         
-        try {
-        	allFields = readFieldData(FIELD_DATA_FILENAME);
-        } catch (JsonIOException |
-        		JsonSyntaxException |
-        		FileNotFoundException e) {
-        	e.printStackTrace();
-        }
-        
         // Give player initial fields
-        playerFields.add(allFields.get(0));
-        playerFields.add(allFields.get(1));
-        
-        // Mark player's fields owned in list of all fields
-        allFields.get(0).setOwned(true);
-        allFields.get(1).setOwned(true);
+        playerFields.add(availableFields.get(0));
+        availableFields.remove(0);
         
     }
     
@@ -128,8 +139,8 @@ public class Game {
         	 * TODO: revise this once the player can e.g. sell assets
         	 */
             if (money < 1) {
-            	log.print("You are bankrupt. You will have to find a job.");
-            	log.newLine();
+            	console.print("You are bankrupt. You will have to find a job.");
+            	console.newLine();
             	break;
             }
         	
@@ -149,16 +160,16 @@ public class Game {
      * Performs any clean-up before exiting the game.
      */
     private void finish() {
-        log.print("Bye!");
-        in.close();
+        console.print("Bye!");
+        console.close();
     }
     
     /**
      * Explains the game to the player.
      */
     private void introduce() {
-        log.print("Welcome to Agricultural Capitalism Simulator!");
-        log.newLine();
+        console.print("Welcome to Agricultural Capitalism Simulator!");
+        console.newLine();
     }
     
     /**
@@ -168,64 +179,48 @@ public class Game {
     	
         while (true) {
             
-            log.print("What would you like to do?");
-            log.newLine();
-            log.print("1) List available crops for purchase");
-            log.print("2) Give current farm status");
-            log.print("3) Buy and plant crops");
-            log.print("4) Purchase new fields");
-            log.print("5) Advance to next year's harvest");
-            log.print("6) Stop playing");
-            log.newLine();
+            List<Action> actions = new ArrayList<Action>();
+            
+            actions.add(new ListCropsAction(this));
+            actions.add(new StatusAction(this));
+            actions.add(new BuyCropsAction(this));
+            actions.add(new BuyFieldsAction(this));
+            actions.add(new PlayAction(this));
+            actions.add(new ExitAction(this));
+            
+            console.print("What would you like to do?");
+            console.newLine();
+            
+            for (int i = 0; i < actions.size(); i++) {
+                Action action = actions.get(i);
+                console.print((i + 1) + ") " + action.getPrompt());
+            }
+            console.newLine();
             
             int input = 0;
-            while (input < 1 || input > 5) {
-            	input = in.nextInt();
+            while (input < 1 || input > actions.size()) {
+            	input = console.nextInt();
             }
             
-            log.newLine();
+            console.newLine();
             
-            if (input == 1) {
-            	listCrops();
-            	waitForEnter();
-                log.sectionBreak();
-                log.newLine();
-            	continue;
-            }
+            Action action = actions.get(input - 1);
+            action.execute();
             
-            if (input == 2) {
-                reportStatus();
-                waitForEnter();
-                log.sectionBreak();
-                log.newLine();
-                continue;
-            }
-            
-            if (input == 3) {
-                plant();
-                continue;
-            }
-            
-            if (input == 4) {
-            	buyFields();
-            	continue;
-            }
-            
-            if (input == 5) {
-            	break;
-            }
-            
-            if (input == 6) {
-                exiting = true;
+            if (action.shouldEndRound()) {
                 break;
             }
+            
+            console.waitForEnter();
+            console.sectionBreak();
+            console.newLine();
         }
     }
     
     /**
      * Allow player to purchase and plant crops in available fields.
      */
-    private void plant() {
+    public void buyCrops() {
                 
         List<Field> emptyFields = playerFields.stream()
                 .filter(f -> f.isEmpty())
@@ -233,39 +228,39 @@ public class Game {
         
         // Return to menu if no fields have available space
         if (emptyFields.size() == 0) {
-        	log.print("Your fields are fully planted.");
-        	log.newLine();
-        	waitForEnter();
+        	console.print("Your fields are fully planted.");
+        	console.newLine();
+        	console.waitForEnter();
         	return;
         } 
         
-        log.print("Your available fields:");
+        console.print("Your available fields:");
         
         for (int i = 0; i < emptyFields.size(); i++) {
-            log.print((i + 1) + ") " + emptyFields.get(i).getName());
+            console.print((i + 1) + ") " + emptyFields.get(i).getName());
         }
         
-        log.newLine();
-        log.print("Which field would you like to plant in?");
+        console.newLine();
+        console.print("Which field would you like to plant in?");
         
         int fieldChoice = -1;
         while (fieldChoice < 0 || fieldChoice >= emptyFields.size()) {
-            fieldChoice = in.nextInt() - 1;
+            fieldChoice = console.nextInt() - 1;
         }
         
-        log.newLine();
-        log.print("Available crops for planting:");
+        console.newLine();
+        console.print("Available crops for planting:");
         
         for (int i = 0; i < crops.size(); i++) {
-            log.print((i + 1) + ") " + crops.get(i).getName());
+            console.print((i + 1) + ") " + crops.get(i).getName());
         }
         
-        log.newLine();
-        log.print("Which crop would you like to plant?");
+        console.newLine();
+        console.print("Which crop would you like to plant?");
         
         int cropChoice = -1;
         while (cropChoice < 0 || cropChoice >= crops.size()) {
-            cropChoice = in.nextInt() - 1;
+            cropChoice = console.nextInt() - 1;
         }
         
         Field field = emptyFields.get(fieldChoice);
@@ -276,138 +271,125 @@ public class Game {
                 field.getMaxCropQuantity(),
                 (int) (money / crop.getCost()));
         
-        log.newLine();
-        log.print("How many units would you like to purchase (maximum " 
+        console.newLine();
+        console.print("How many units would you like to purchase (maximum " 
                 + maxVolume + ")?");
 
         int quantity = -1;
         while (quantity < 0 || quantity > maxVolume) {
-            quantity = in.nextInt();
+            quantity = console.nextInt();
         }
         
-        log.newLine();
+        console.newLine();
         
         if (quantity == 0) {
-        	waitForEnter();
+        	console.waitForEnter();
             return;
         }
         
         field.setCrop(crop);
         field.setCropQuantity(quantity);
         
-        money -= quantity * crop.getCost();
-        expenditure += quantity * crop.getCost();
+        int totalCost = quantity * crop.getCost();
+        
+        money -= totalCost;
+        expenditure += totalCost;
     }
     
     /**
      * Allow player to buy new fields
      */
-    private void buyFields() {
-    	
-    	// Get list of fields that are not owned by player
-    	List<Field> availableFields = allFields.stream()
-    			.filter(f -> f.isNotOwned())
-    			.collect(Collectors.toList());
+    public void buyFields() {
     	
     	// If there are no fields available, return player to menu
     	if (availableFields.size() == 0) {
-    		log.print("There are no fields remaining for purchase!");
-    		log.newLine();
-    		waitForEnter();
+    		console.print("There are no fields remaining for purchase!");
+    		console.newLine();
+    		console.waitForEnter();
     		return;
     	}
     	
-    	log.print("Here are the fields available for purchase: ");
-    	log.newLine();
+    	console.print("Here are the fields available for purchase:");
+    	console.newLine();
     	
     	for (int i = 0; i < availableFields.size(); i++) {
-    		log.print((i + 1) + ") " + availableFields.get(i).getName() + ", "
-    				+ availableFields.get(i).getDescription());
-    		log.print("Price: " + availableFields.get(i).getPrice());
-    		log.newLine();
+    		console.print((i + 1) + ") " + 
+    		        availableFields.get(i).getName() + ", " +
+    				availableFields.get(i).getDescription());
+    		console.print("Price: " + availableFields.get(i).getPrice());
+    		console.newLine();
     	}
     	
-    	log.print("Which field would you like to purchase? Enter " +
+    	console.print("Which field would you like to purchase? Enter " +
     			(availableFields.size() + 1) + " to return to menu.");
     	
     	int fieldChoice = -1;
-    	while (fieldChoice < 0 || fieldChoice >= availableFields.size()) {
-    		fieldChoice = in.nextInt() - 1;
-    		
-    		// If player has selected the return command, return to menu
-        	if (fieldChoice == availableFields.size()) {
-        		log.newLine();
-        		waitForEnter();
-        		return;
-        	}
+    	while (fieldChoice < 0 || fieldChoice > availableFields.size()) {
+    		fieldChoice = console.nextInt() - 1;
     	}
+
+        // If player has selected the return command, return to menu
+        if (fieldChoice == availableFields.size()) {
+            console.newLine();
+            console.waitForEnter();
+            return;
+        }
     	
     	if (availableFields.get(fieldChoice).getPrice() > money) {
-    		log.print("Sorry, you have insufficient funds.");
-    		log.newLine();
-    		waitForEnter();
+    		console.print("Sorry, you have insufficient funds.");
+    		console.newLine();
+    		console.waitForEnter();
     		return;
-    	} else {
-    		
-    		// Add to player's fields, mark it owned, deduct money
-    		playerFields.add(availableFields.get(fieldChoice));
-    		allFields.get(availableFields.get(fieldChoice).getFieldId())
-    			.setOwned(true);
-    		
-    		long price = availableFields.get(fieldChoice).getPrice();
-    		
-    		money -= price;
-    		expenditure += price;
-    		newAssets += price;
     	}
+    		
+		// Add to player's fields, mark it owned, deduct money
+		playerFields.add(availableFields.get(fieldChoice));
+        int price = availableFields.get(fieldChoice).getPrice();
+		availableFields.remove(fieldChoice);
+		
+		money -= price;
+		expenditure += price;
+		newAssets += price;
     	
-    	log.newLine();
+    	console.newLine();
     	
-    }
-    
-    /**
-     * Wait for a prompt before returning to menu.
-     */
-    private void waitForEnter() {
-        log.print("Press ENTER to continue.");
-        in.nextLine();
     }
     
     /**
      * List crops that are available for purchase.
      */
-    private void listCrops() {
+    public void listCrops() {
     	for (Crop crop : crops) {
-    		log.print("**" + crop.getName());
-    		log.print(crop.getDescription());
-    		log.print("Cost: " + crop.getCost());
-    		log.print("Sale Price: " + crop.getSalePrice());
-    		log.newLine();
+    		console.print("**" + crop.getName());
+    		console.print(crop.getDescription());
+    		console.print("Cost: " + crop.getCost());
+    		console.print("Sale Price: " + crop.getSalePrice());
+    		console.newLine();
     	}
     }
     
     /**
      * Report farm status to player.
      */
-    private void reportStatus() {
+    public void reportStatus() {
         
-        log.print("Year: " + year);
-        log.print("Balance: " + money);
-        log.print("Asset value: " + calculateAssets());
+        console.print("Year: " + year);
+        console.print("Balance: " + money);
+        console.print("Asset value: " + calculateAssets());
         
-        log.newLine();
+        console.newLine();
         
-        log.print("Fields:");
+        console.print("Fields:");
         
         for (Field field: playerFields) {
             
             Crop crop = field.getCrop();
             
             if (crop == null) {
-                log.print(field.getName() + ", value " + 
+                console.print(field.getName() + ", value " + 
                 		field.getPrice() + ", is empty!");
             } else {
-                log.print(field.getName() + ", value " + 
+                console.print(field.getName() + ", value " + 
                 		field.getPrice() + " - " + 
                 		crop.getName() + " (" +
                         field.getCropQuantity() + " / " +
@@ -415,7 +397,7 @@ public class Game {
             }
         }
 
-        log.newLine();
+        console.newLine();
     }
     
     /**
@@ -425,7 +407,7 @@ public class Game {
         
         double wetness = generateWetness();
         double heat = generateHeat();
-        long profit = calculateProfit(wetness, heat);
+        int profit = calculateProfit(wetness, heat);
         
         money += profit;
         year++;
@@ -439,15 +421,14 @@ public class Game {
     
     /**
      * Generates a random value for wetness.
-     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
      * 
      * @return
      */
     private double generateWetness() {
     	double wetness = 0;
     	
-    	while (wetness < 0.7 || wetness > 1.3) {
-    		wetness = (rand.nextGaussian() * 0.1 + 1);
+    	while (wetness < MIN_WETNESS || wetness > MAX_WETNESS) {
+    		wetness = rand.nextGaussian() * WETNESS_DEVIATION + 1;
     	}
     	
     	return wetness;
@@ -455,15 +436,14 @@ public class Game {
     
     /**
      * Generates a random value for heat.
-     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
      * 
      * @return
      */
     private double generateHeat() {
     	double heat = 0;
     	
-    	while (heat < 0.7 || heat > 1.3) {
-    		heat = (rand.nextGaussian() * 0.1 + 1);
+    	while (heat < MIN_HEAT || heat > MAX_HEAT) {
+    		heat = rand.nextGaussian() * HEAT_DEVIATION + 1;
     	}
     	
     	return heat;
@@ -476,9 +456,9 @@ public class Game {
      * @param heat
      * @return
      */
-    private long calculateProfit(double wetness, double heat) {
+    private int calculateProfit(double wetness, double heat) {
     	
-        long profit = 0;
+        int profit = 0;
         
         for (Field field : playerFields) {
             
@@ -508,7 +488,7 @@ public class Game {
      * 
      * @return
      */
-    private long calculateAssets() {
+    private int calculateAssets() {
     	
     	int assets = 0;
     	
@@ -528,29 +508,26 @@ public class Game {
      * @param heat
      */
     private void reportWeather(double wetness, double heat) {
-    	
-    	double lowerBound = 0.9;
-    	double upperBound = 1.1;
     	    	
     	String report;
     	
-    	if (heat < lowerBound) {
+    	if (heat < WEATHER_LOW_BOUND) {
     		report = "This was a frigid year ";
-    	} else if (heat > upperBound) {
+    	} else if (heat > WEATHER_UPPER_BOUND) {
     		report = "This was a scorching year ";
     	} else {
     		report = "This was a temperate year ";
     	}
     	
-    	if (wetness < lowerBound) {
-    		report = report + "with little precipitation.";
-    	} else if (wetness > upperBound) {
-    		report = report + "with torrential downpours.";
+    	if (wetness < WEATHER_LOW_BOUND) {
+    		report += "with little precipitation.";
+    	} else if (wetness > WEATHER_UPPER_BOUND) {
+    		report += "with torrential downpours.";
     	} else {
-    		report = report + "with modest rainfall.";
+    		report += "with modest rainfall.";
     	}
     	
-    	log.print(report);
+    	console.print(report);
     	
     }
     
@@ -561,36 +538,40 @@ public class Game {
      * @param wetness 
      * @param profit 
      */
-    private void showResults(double wetness, double heat, long profit) {
+    private void showResults(double wetness, double heat, int profit) {
         
-    	log.sectionBreak();
+    	console.sectionBreak();
     	reportWeather(wetness, heat);
-    	log.newLine();
+    	console.newLine();
     	    	
-    	long netProfit = profit + newAssets - expenditure;
+    	int netProfit = profit + newAssets - expenditure;
     	
-    	log.print("Year " + (year - 1) + " performance:");
-    	log.print("Asset acquisitions: " + newAssets);
-    	log.print("Revenue: " + profit);
-    	log.print("Expenses: " + expenditure);
-    	log.print("---------------------");
+    	console.print("Year " + (year - 1) + " performance:");
+    	console.print("Asset acquisitions: " + newAssets);
+    	console.print("Revenue: " + profit);
+    	console.print("Expenses: " + expenditure);
+    	console.print("---------------------");
     	
         if (netProfit > 0) {
-            log.print("Congratulations! You made a net profit of " + netProfit + ".");
+            console.print("Congratulations! You made a net profit of " + netProfit + ".");
         } else if (netProfit == 0) {
-            log.print("It could be worse; you broke even.");
+            console.print("It could be worse; you broke even.");
         } else {
-            log.print("Commiserations! You made a loss of " + netProfit + ".");
+            console.print("Commiserations! You made a loss of " + netProfit + ".");
         }
         
         expenditure = 0;
         newAssets = 0;
         
-        log.print("Year end balance: " + money);
-        log.print("Total asset value: " + calculateAssets());
-        log.sectionBreak();
-        log.newLine();
+        console.print("Year end balance: " + money);
+        console.print("Total asset value: " + calculateAssets());
+        console.sectionBreak();
+        console.newLine();
                 
+    }
+
+    public void exit() {
+        exiting = true;
     }
 
 }

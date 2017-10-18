@@ -15,5 +15,7 @@ To Do
  - Balance crops
  - Adding more crops
 
- - [Issue] waitForEnter seems not to be waiting for ENTER?
  - Unit tests
+
+ - Dynamic actions list instead of harcoded
+ 
