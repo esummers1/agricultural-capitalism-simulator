@@ -304,8 +304,6 @@ public class Game {
     	// If there are no fields available, return player to menu
     	if (availableFields.size() == 0) {
     		console.print("There are no fields remaining for purchase!");
-    		console.newLine();
-    		console.waitForEnter();
     		return;
     	}
     	
@@ -330,15 +328,11 @@ public class Game {
 
         // If player has selected the return command, return to menu
         if (fieldChoice == availableFields.size()) {
-            console.newLine();
-            console.waitForEnter();
             return;
         }
     	
     	if (availableFields.get(fieldChoice).getPrice() > money) {
     		console.print("Sorry, you have insufficient funds.");
-    		console.newLine();
-    		console.waitForEnter();
     		return;
     	}
     		
@@ -352,7 +346,6 @@ public class Game {
 		newAssets += price;
     	
     	console.newLine();
-    	
     }
     
     /**
