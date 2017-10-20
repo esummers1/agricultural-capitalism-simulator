@@ -1,11 +1,12 @@
 package main;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Console {
 
     private static final String SECTION_BREAK = 
-            "==============================";
+            "===================================";
 
     private Scanner in = new Scanner(System.in);
     
@@ -34,8 +35,20 @@ public class Console {
     }
 
     public int nextInt() {
-        int value = in.nextInt();
-        
+    	
+    	boolean validEntry = false;
+    	int value = 0;
+    	
+    	// Catch a non-integer entry and ignore it
+    	while (!validEntry) {
+	    	try {
+	    		value = in.nextInt();
+	    		validEntry = true;
+	        } catch (InputMismatchException e) {
+	        	break;
+	        }
+    	}
+	    
         // Skip over any unconsumed input
         in.nextLine();
         

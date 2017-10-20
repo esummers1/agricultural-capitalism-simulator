@@ -27,22 +27,29 @@ public class Game {
     private static final String CROP_DATA_FILENAME = "crops.dat";
     private static final String FIELD_DATA_FILENAME = "fields.dat";
 
-    private static final double WEATHER_LOW_BOUND = 0.9;
-    private static final double WEATHER_UPPER_BOUND = 1.1;
-
     /*
      * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
      */
     private static final double WETNESS_DEVIATION = 0.1;
-    private static final double MIN_WETNESS = 1 - 3 * WETNESS_DEVIATION;
-    private static final double MAX_WETNESS = 1 + 3 * WETNESS_DEVIATION;
+    private static final double WETNESS_MIN = 1 - 3 * WETNESS_DEVIATION;
+    private static final double WETNESS_MAX = 1 + 3 * WETNESS_DEVIATION;
+    
+    private static final double WETNESS_LOW = 1 - 1.5 * WETNESS_DEVIATION;
+    private static final double WETNESS_MOD_LOW = 1 - 0.75 * WETNESS_DEVIATION;
+    private static final double WETNESS_MOD_HIGH = 1 + 0.75 * WETNESS_DEVIATION;
+    private static final double WETNESS_HIGH = 1 + 1.5 * WETNESS_DEVIATION;
 
     /*
      * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
      */
     private static final double HEAT_DEVIATION = 0.1;
-    private static final double MIN_HEAT = 1 - 3 * HEAT_DEVIATION;
-    private static final double MAX_HEAT = 1 + 3 * HEAT_DEVIATION;
+    private static final double HEAT_MIN = 1 - 3 * HEAT_DEVIATION;
+    private static final double HEAT_MAX = 1 + 3 * HEAT_DEVIATION;
+    
+    private static final double HEAT_LOW = 1 - 1.5 * HEAT_DEVIATION;
+    private static final double HEAT_MOD_LOW = 1 - 0.75 * HEAT_DEVIATION;
+    private static final double HEAT_MOD_HIGH = 1 + 0.75 * HEAT_DEVIATION;
+    private static final double HEAT_HIGH = 1 + 1.5 * HEAT_DEVIATION;
     
     /**
      * The player's current balance.
@@ -420,7 +427,7 @@ public class Game {
     private double generateWetness() {
     	double wetness = 0;
     	
-    	while (wetness < MIN_WETNESS || wetness > MAX_WETNESS) {
+    	while (wetness < WETNESS_MIN || wetness > WETNESS_MAX) {
     		wetness = rand.nextGaussian() * WETNESS_DEVIATION + 1;
     	}
     	
@@ -435,7 +442,7 @@ public class Game {
     private double generateHeat() {
     	double heat = 0;
     	
-    	while (heat < MIN_HEAT || heat > MAX_HEAT) {
+    	while (heat < HEAT_MIN || heat > HEAT_MAX) {
     		heat = rand.nextGaussian() * HEAT_DEVIATION + 1;
     	}
     	
@@ -504,20 +511,28 @@ public class Game {
     	    	
     	String report;
     	
-    	if (heat < WEATHER_LOW_BOUND) {
+    	if (heat < HEAT_LOW) {
     		report = "This was a frigid year ";
-    	} else if (heat > WEATHER_UPPER_BOUND) {
-    		report = "This was a scorching year ";
-    	} else {
+    	} else if (heat < HEAT_MOD_LOW) {
+    		report = "This was a chilly year ";
+    	} else if (heat < HEAT_MOD_HIGH) {
     		report = "This was a temperate year ";
+    	} else if (heat < HEAT_HIGH) {
+    		report = "This was a sultry year ";
+    	} else {
+    		report = "This was a scorching year ";
     	}
     	
-    	if (wetness < WEATHER_LOW_BOUND) {
+    	if (wetness < WETNESS_LOW) {
+    		report += "with arid rainfall.";
+    	} else if (wetness < WETNESS_MOD_LOW) {
     		report += "with little precipitation.";
-    	} else if (wetness > WEATHER_UPPER_BOUND) {
-    		report += "with torrential downpours.";
-    	} else {
+    	} else if (wetness < WETNESS_MOD_HIGH) {
     		report += "with modest rainfall.";
+    	} else if (wetness < WETNESS_HIGH) {
+    		report += "with heavy rain.";
+    	} else {
+    		report += "with monsoon downpours.";
     	}
     	
     	console.print(report);
@@ -540,9 +555,11 @@ public class Game {
     	int netProfit = profit + newAssets - expenditure;
     	
     	console.print("Year " + (year - 1) + " performance:");
+    	console.newLine();
     	console.print("Asset acquisitions: " + newAssets);
     	console.print("Revenue: " + profit);
     	console.print("Expenses: " + expenditure);
+    	console.newLine();
     	console.print("---------------------");
     	
         if (netProfit > 0) {

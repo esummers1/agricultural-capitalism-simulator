@@ -3,12 +3,8 @@ To Do
 ================================================================================
 
  - Endgame condition e.g. score evaluation after 10 years
- - Handle user inputting strings when program expects an integer
  - Add ability to sell fields, as a cash injection?
- - Perhaps make a method similar to waitForEnter which includes a return line,
-    for returning to menu?
-
- - Revise crop yield algorithm - perhaps factor sun in, too?
+ - Revise crop yield algorithm
   - Currently both factors are additive - is suboptimal for e.g. crops which
     are sensitive to rain
 
@@ -16,6 +12,4 @@ To Do
  - Adding more crops
 
  - Unit tests
-
- - Dynamic actions list instead of harcoded
  

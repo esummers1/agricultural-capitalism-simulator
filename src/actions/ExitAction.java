@@ -17,5 +17,10 @@ public class ExitAction extends Action {
     public String getPrompt() {
         return "Stop playing";
     }
+    
+    @Override
+    public boolean shouldEndRound() {
+    	return true;
+    }
 
 }
