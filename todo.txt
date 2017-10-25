@@ -8,6 +8,8 @@ To Do
   - Currently both factors are additive - is suboptimal for e.g. crops which
     are sensitive to rain
 
+ - Use weather class + array to report weather
+
  - Balance crops
  - Adding more crops
 

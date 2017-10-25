@@ -5,8 +5,10 @@
     "description": "Tuber of the Nightshade family which prefers a cool, wet climate. Considered a staple food of many nations due to its starch content.",
     "cost": 10,
     "salePrice": 12,
-    "yieldMultiplierWetness": 2.0,
-    "yieldMultiplierHeat": 0.5,
+    "wetnessFactor": 2.0,
+    "heatFactor": 0.5,
+    "idealHeat": 1,
+    "idealWetness": 1,
     "fertility": 1.0
   },
   {
@@ -15,8 +17,10 @@
     "description": "Nutritious root vegetable of the Carrot family, cheap to grow and thriving in sunny weather.",
     "cost": 8,
     "salePrice": 14,
-    "yieldMultiplierWetness": 1.5,
-    "yieldMultiplierHeat": 0.6,
+    "wetnessFactor": 1.5,
+    "heatFactor": 0.6,
+    "idealHeat": 1,
+    "idealWetness": 1,
     "fertility": 1.0
   },
   {
@@ -25,8 +29,10 @@
     "description": "Tasty root vegetable of the Cabbage family, benefiting from high yields but suffering in hot climates.",
     "cost": 8,
     "salePrice": 14,
-    "yieldMultiplierWetness": 1.5,
-    "yieldMultiplierHeat": 0.6,
+    "wetnessFactor": 1.5,
+    "heatFactor": 0.6,
+    "idealHeat": 1,
+    "idealWetness": 1,
     "fertility": 1.0
   },
   {
@@ -35,8 +41,10 @@
     "description": "Grain of the Grass family grown worldwide as a staple food due to its high protein content. Produces large yields and is weather-resistant,  but requires large plantings to be profitable.",
     "cost": 7,
     "salePrice": 10,
-    "yieldMultiplierWetness": 1.2,
-    "yieldMultiplierHeat": 0.8,
+    "wetnessFactor": 1.2,
+    "heatFactor": 0.8,
+    "idealHeat": 1,
+    "idealWetness": 1,
     "fertility": 1.2
   }
 ]

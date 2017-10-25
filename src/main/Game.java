@@ -26,7 +26,35 @@ public class Game {
     
     private static final String CROP_DATA_FILENAME = "crops.dat";
     private static final String FIELD_DATA_FILENAME = "fields.dat";
-
+    
+    private static final WeatherBand[] HEAT_BANDS = new WeatherBand[] {
+            new WeatherBand(-3.0, "This was a glacial year "),
+            new WeatherBand(-2.5, "This was a freezing year "),
+            new WeatherBand(-2.0, "This was a frigid year "),
+            new WeatherBand(-1.5, "This was a bracing year "),
+            new WeatherBand(-1.0, "This was a chilly year "),
+            new WeatherBand(-0.5, "This was a mild year "),
+            new WeatherBand(0.5, "This was a warm year "),
+            new WeatherBand(1.0, "This was a hot year "),
+            new WeatherBand(1.5, "This was a sultry year "),
+            new WeatherBand(2.0, "This was a sweltering year "),
+            new WeatherBand(2.5, "This was a scorching year "),
+    };
+    
+    private static final WeatherBand[] WETNESS_BANDS = new WeatherBand[] {
+            new WeatherBand(-3.0, "with an arid climate."),
+            new WeatherBand(-2.5, "with minimal precipitation."),
+            new WeatherBand(-2.0, "with scattered drizzle."),
+            new WeatherBand(-1.5, "with scarce rainfall."),
+            new WeatherBand(-1.0, "with light showers."),
+            new WeatherBand(-0.5, "with moderate rainfall."),
+            new WeatherBand(0.5, "with considerable precipitation."),
+            new WeatherBand(1.0, "with heavy rainfall."),
+            new WeatherBand(1.5, "with some squalling."),
+            new WeatherBand(2.0, "with torrential downpours."),
+            new WeatherBand(2.5, "with monsoon storms."), 
+    };
+    
     /*
      * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
      */
@@ -469,10 +497,20 @@ public class Game {
                 continue;
             }
             
-            double heatFactor =
-                    heat * crop.getYieldMultiplierHeat();
-            double wetnessFactor =
-                    wetness * crop.getYieldMultiplierWetness();
+            /*
+             * TODO:
+             * 
+             * Calculate difference between ideal and actual heat / wetness.
+             * 
+             * Subtract from maximum difference to get a "score".
+             * 
+             * Square this value so that a greater difference has a greater impact.
+             * 
+             * Somehow use this score along with heatFactor / wetnessFactor to
+             * determine the final yield.
+             */
+            double heatFactor = heat * crop.getHeatFactor();
+            double wetnessFactor = wetness * crop.getWetnessFactor();
             double yield = 
                     ((heatFactor + wetnessFactor) / 2) * crop.getFertility();
             
