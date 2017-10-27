@@ -8,7 +8,7 @@
     "wetnessFactor": 2.0,
     "heatFactor": 0.5,
     "idealHeat": 1,
-    "idealWetness": 1,
+    "idealWetness": 1
   },
   {
     "id": 1,
@@ -19,7 +19,7 @@
     "wetnessFactor": 1.5,
     "heatFactor": 0.6,
     "idealHeat": 1,
-    "idealWetness": 1,
+    "idealWetness": 1
   },
   {
     "id": 2,
@@ -30,7 +30,7 @@
     "wetnessFactor": 1.5,
     "heatFactor": 0.6,
     "idealHeat": 1,
-    "idealWetness": 1,
+    "idealWetness": 1
   },
   {
     "id": 3,
@@ -41,6 +41,6 @@
     "wetnessFactor": 1.2,
     "heatFactor": 0.8,
     "idealHeat": 1,
-    "idealWetness": 1,
+    "idealWetness": 1
   }
 ]

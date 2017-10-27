@@ -552,7 +552,6 @@ public class Game {
     
     /**
      * Report the year's weather in plain English.
-     * Non-average weather reports come at 1 stdev from mean.
      * 
      * @param wetness
      * @param heat
@@ -561,15 +560,21 @@ public class Game {
     	    	
     	String report = "";
     	
-    	for (int i = HEAT_BANDS.length; i == 0; i--) {
-    		if (heat >= HEAT_BANDS[i].getMinValue()) {
+    	for (int i = HEAT_BANDS.length - 1; i > -1; i--) {
+    		double thisHeatBand = HEAT_BANDS[i].getMinValue();
+    		
+    		if (heat >= (1 + HEAT_DEVIATION * thisHeatBand)) {
     			report = HEAT_BANDS[i].getMessage();
+    			break;
     		}
     	}
     	
-    	for (int i = WETNESS_BANDS.length; i == 0; i--) {
-    		if (wetness >= WETNESS_BANDS[i].getMinValue()) {
+    	for (int i = WETNESS_BANDS.length - 1; i > -1; i--) {
+    		double thisWetnessBand = WETNESS_BANDS[i].getMinValue();
+    		
+    		if (wetness >= (1 + WETNESS_DEVIATION * thisWetnessBand)) {
     			report += WETNESS_BANDS[i].getMessage();
+    			break;
     		}
     	}
     	
