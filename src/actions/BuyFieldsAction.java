@@ -15,7 +15,7 @@ public class BuyFieldsAction extends Action {
 
     @Override
     public String getPrompt() {
-        return "Purchase new fields";
+        return "Acquire new fields";
     }
 
 }

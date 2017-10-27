@@ -15,7 +15,7 @@ public class ListCropsAction extends Action {
 
     @Override
     public String getPrompt() {
-        return "List available crops for purchase";
+        return "See crops available for purchase";
     }
 
 }

@@ -35,11 +35,7 @@ public class Crop {
      * 2 = crop is heavily affected by wetness
      */
     private double wetnessFactor;
-
-    /**
-     * The overall multiplier applied to the yield.
-     */
-    private double fertility;
+    
     
     public Crop() {
         // No-argument constructor for reflection
@@ -79,10 +75,6 @@ public class Crop {
     
     public double getIdealWetness() {
         return idealWetness;
-    }
-    
-    public double getFertility() {
-        return fertility;
     }
     
     @Override

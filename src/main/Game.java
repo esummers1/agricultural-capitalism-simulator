@@ -2,6 +2,7 @@ package main;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,9 +25,31 @@ import actions.StatusAction;
 
 public class Game {
     
+	/*
+	 * Setting determining the length of the game.
+	 */
+	private static final int END_GAME_YEAR = 15;
+	
     private static final String CROP_DATA_FILENAME = "crops.dat";
     private static final String FIELD_DATA_FILENAME = "fields.dat";
     
+    /*
+     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
+     */
+    private static final double WETNESS_DEVIATION = 0.1;
+    private static final double WETNESS_MIN = 1 - 3 * WETNESS_DEVIATION;
+    private static final double WETNESS_MAX = 1 + 3 * WETNESS_DEVIATION;
+
+    /*
+     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
+     */
+    private static final double HEAT_DEVIATION = 0.1;
+    private static final double HEAT_MIN = 1 - 3 * HEAT_DEVIATION;
+    private static final double HEAT_MAX = 1 + 3 * HEAT_DEVIATION;
+    
+    /*
+     * Heat intervals for weather reporting between minimum and maximum
+     */
     private static final WeatherBand[] HEAT_BANDS = new WeatherBand[] {
             new WeatherBand(-3.0, "This was a glacial year "),
             new WeatherBand(-2.5, "This was a freezing year "),
@@ -41,6 +64,9 @@ public class Game {
             new WeatherBand(2.5, "This was a scorching year "),
     };
     
+    /*
+     * Wetness intervals for weather reporting between minimum and maximum
+     */
     private static final WeatherBand[] WETNESS_BANDS = new WeatherBand[] {
             new WeatherBand(-3.0, "with an arid climate."),
             new WeatherBand(-2.5, "with minimal precipitation."),
@@ -54,30 +80,6 @@ public class Game {
             new WeatherBand(2.0, "with torrential downpours."),
             new WeatherBand(2.5, "with monsoon storms."), 
     };
-    
-    /*
-     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
-     */
-    private static final double WETNESS_DEVIATION = 0.1;
-    private static final double WETNESS_MIN = 1 - 3 * WETNESS_DEVIATION;
-    private static final double WETNESS_MAX = 1 + 3 * WETNESS_DEVIATION;
-    
-    private static final double WETNESS_LOW = 1 - 1.5 * WETNESS_DEVIATION;
-    private static final double WETNESS_MOD_LOW = 1 - 0.75 * WETNESS_DEVIATION;
-    private static final double WETNESS_MOD_HIGH = 1 + 0.75 * WETNESS_DEVIATION;
-    private static final double WETNESS_HIGH = 1 + 1.5 * WETNESS_DEVIATION;
-
-    /*
-     * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
-     */
-    private static final double HEAT_DEVIATION = 0.1;
-    private static final double HEAT_MIN = 1 - 3 * HEAT_DEVIATION;
-    private static final double HEAT_MAX = 1 + 3 * HEAT_DEVIATION;
-    
-    private static final double HEAT_LOW = 1 - 1.5 * HEAT_DEVIATION;
-    private static final double HEAT_MOD_LOW = 1 - 0.75 * HEAT_DEVIATION;
-    private static final double HEAT_MOD_HIGH = 1 + 0.75 * HEAT_DEVIATION;
-    private static final double HEAT_HIGH = 1 + 1.5 * HEAT_DEVIATION;
     
     /**
      * The player's current balance.
@@ -120,7 +122,7 @@ public class Game {
             e.printStackTrace();
         }
         
-        // Give player initial fields
+        // Give player initial field
         playerFields.add(availableFields.get(0));
         availableFields.remove(0);
         
@@ -164,14 +166,13 @@ public class Game {
      * The game loop.
      */
     public void run() {
-        
+    	
         introduce();
         
         while (!exiting){
         	
         	/**
         	 * End game if player has no remaining funds.
-        	 * TODO: revise this once the player can e.g. sell assets
         	 */
             if (money < 1) {
             	console.print("You are bankrupt. You will have to find a job.");
@@ -186,6 +187,12 @@ public class Game {
             }
             
             processGame();
+            
+        	if (year - 1 == END_GAME_YEAR) {
+        		evaluateScore();
+        		break;
+        	}
+        	
         }
         
         finish();
@@ -204,6 +211,11 @@ public class Game {
      */
     private void introduce() {
         console.print("Welcome to Agricultural Capitalism Simulator!");
+        console.newLine();
+        console.print("You have " + END_GAME_YEAR + " years to make "
+        		+ "maximum profit.");
+        console.newLine();
+        console.sectionBreak();
         console.newLine();
     }
     
@@ -512,7 +524,7 @@ public class Game {
             double heatFactor = heat * crop.getHeatFactor();
             double wetnessFactor = wetness * crop.getWetnessFactor();
             double yield = 
-                    ((heatFactor + wetnessFactor) / 2) * crop.getFertility();
+                    ((heatFactor + wetnessFactor) / 2);
             
             profit += yield * field.getCropQuantity() * 
                     crop.getSalePrice() * field.getSoilQuality();
@@ -547,30 +559,18 @@ public class Game {
      */
     private void reportWeather(double wetness, double heat) {
     	    	
-    	String report;
+    	String report = "";
     	
-    	if (heat < HEAT_LOW) {
-    		report = "This was a frigid year ";
-    	} else if (heat < HEAT_MOD_LOW) {
-    		report = "This was a chilly year ";
-    	} else if (heat < HEAT_MOD_HIGH) {
-    		report = "This was a temperate year ";
-    	} else if (heat < HEAT_HIGH) {
-    		report = "This was a sultry year ";
-    	} else {
-    		report = "This was a scorching year ";
+    	for (int i = HEAT_BANDS.length; i == 0; i--) {
+    		if (heat >= HEAT_BANDS[i].getMinValue()) {
+    			report = HEAT_BANDS[i].getMessage();
+    		}
     	}
     	
-    	if (wetness < WETNESS_LOW) {
-    		report += "with arid rainfall.";
-    	} else if (wetness < WETNESS_MOD_LOW) {
-    		report += "with little precipitation.";
-    	} else if (wetness < WETNESS_MOD_HIGH) {
-    		report += "with modest rainfall.";
-    	} else if (wetness < WETNESS_HIGH) {
-    		report += "with heavy rain.";
-    	} else {
-    		report += "with monsoon downpours.";
+    	for (int i = WETNESS_BANDS.length; i == 0; i--) {
+    		if (wetness >= WETNESS_BANDS[i].getMinValue()) {
+    			report += WETNESS_BANDS[i].getMessage();
+    		}
     	}
     	
     	console.print(report);
@@ -616,6 +616,19 @@ public class Game {
         console.sectionBreak();
         console.newLine();
                 
+    }
+    
+    /**
+     * Calculate and report the player's final score.
+     */
+    private void evaluateScore() {
+    	
+    	int score = money + calculateAssets();
+    	console.print("Final score: " + score);
+    	console.newLine();
+    	console.print("Well played, capitalist! The rich get richer.");
+    	console.newLine();
+    	
     }
 
     public void exit() {

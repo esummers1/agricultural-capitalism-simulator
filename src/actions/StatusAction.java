@@ -15,7 +15,7 @@ public class StatusAction extends Action {
 
     @Override
     public String getPrompt() {
-        return "Give current farm status";
+        return "Review current farm status";
     }
 
 }

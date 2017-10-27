@@ -9,7 +9,6 @@
     "heatFactor": 0.5,
     "idealHeat": 1,
     "idealWetness": 1,
-    "fertility": 1.0
   },
   {
     "id": 1,
@@ -21,7 +20,6 @@
     "heatFactor": 0.6,
     "idealHeat": 1,
     "idealWetness": 1,
-    "fertility": 1.0
   },
   {
     "id": 2,
@@ -33,7 +31,6 @@
     "heatFactor": 0.6,
     "idealHeat": 1,
     "idealWetness": 1,
-    "fertility": 1.0
   },
   {
     "id": 3,
@@ -45,6 +42,5 @@
     "heatFactor": 0.8,
     "idealHeat": 1,
     "idealWetness": 1,
-    "fertility": 1.2
   }
 ]

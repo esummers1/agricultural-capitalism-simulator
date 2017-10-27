@@ -2,13 +2,11 @@
 To Do
 ================================================================================
 
- - Endgame condition e.g. score evaluation after 10 years
- - Add ability to sell fields, as a cash injection?
  - Revise crop yield algorithm
   - Currently both factors are additive - is suboptimal for e.g. crops which
     are sensitive to rain
 
- - Use weather class + array to report weather
+ - Report performance of fields in turn so you have insight
 
  - Balance crops
  - Adding more crops
