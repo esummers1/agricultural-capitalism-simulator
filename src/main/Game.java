@@ -2,7 +2,6 @@ package main;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -558,28 +557,37 @@ public class Game {
      */
     private void reportWeather(double wetness, double heat) {
     	    	
-    	String report = "";
-    	
-    	for (int i = HEAT_BANDS.length - 1; i > -1; i--) {
-    		double thisHeatBand = HEAT_BANDS[i].getMinValue();
-    		
-    		if (heat >= (1 + HEAT_DEVIATION * thisHeatBand)) {
-    			report = HEAT_BANDS[i].getMessage();
-    			break;
-    		}
-    	}
-    	
-    	for (int i = WETNESS_BANDS.length - 1; i > -1; i--) {
-    		double thisWetnessBand = WETNESS_BANDS[i].getMinValue();
-    		
-    		if (wetness >= (1 + WETNESS_DEVIATION * thisWetnessBand)) {
-    			report += WETNESS_BANDS[i].getMessage();
-    			break;
-    		}
-    	}
+    	String report = checkBands(heat, HEAT_DEVIATION, HEAT_BANDS);
+    	report += checkBands(wetness, WETNESS_DEVIATION, WETNESS_BANDS);
     	
     	console.print(report);
     	
+    }
+    
+    /**
+     * Return the appropriate in-game description for a weather variable.
+     * 
+     * @param value
+     * @param deviation
+     * @param bands
+     * @return
+     */
+    private String checkBands(double value, double deviation, 
+            WeatherBand[] bands) {
+        
+        String report = "";
+        
+        for (int i = bands.length - 1; i > -1; i--) {
+            double thisHeatBand = bands[i].getMinValue();
+            
+            if (value >= (1 + deviation * thisHeatBand)) {
+                report = bands[i].getMessage();
+                break;
+            }
+        }
+        
+        return report;
+        
     }
     
     /**

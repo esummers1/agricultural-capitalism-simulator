@@ -13,3 +13,9 @@ To Do
 
  - Unit tests
  
+ - Access field descriptions after buying them
+ 
+ - Press ENTER appears twice after entering junk input / buying 0 of a crop
+ 
+ - No way to cancel crop purchase
+ 
