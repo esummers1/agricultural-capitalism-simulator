@@ -27,7 +27,7 @@ public class Game {
 	/*
 	 * Setting determining the length of the game.
 	 */
-	private static final int END_GAME_YEAR = 15;
+	private static final int END_GAME_YEAR = 20;
 	
     private static final String CROP_DATA_FILENAME = "crops.dat";
     private static final String FIELD_DATA_FILENAME = "fields.dat";
@@ -83,7 +83,7 @@ public class Game {
     /**
      * The player's current balance.
      */
-	private int money = 1000;
+	private int money = 500;
 	
 	/**
 	 * The player's yearly expenses.
@@ -425,10 +425,12 @@ public class Game {
             Crop crop = field.getCrop();
             
             if (crop == null) {
-                console.print(field.getName() + ", value " + 
+                console.print(field.getName() + ", size " +
+                		field.getMaxCropQuantity() + ", value " + 
                 		field.getPrice() + ", is empty!");
             } else {
-                console.print(field.getName() + ", value " + 
+                console.print(field.getName() + ", size " +
+                		field.getMaxCropQuantity() + ", value " + 
                 		field.getPrice() + " - " + 
                 		crop.getName() + " (" +
                         field.getCropQuantity() + " / " +
@@ -509,24 +511,23 @@ public class Game {
             }
             
             /*
-             * TODO:
-             * 
-             * Calculate difference between ideal and actual heat / wetness.
-             * 
-             * Subtract from maximum difference to get a "score".
-             * 
-             * Square this value so that a greater difference has a greater impact.
-             * 
-             * Somehow use this score along with heatFactor / wetnessFactor to
-             * determine the final yield.
+             * Evaluate the distance between the crop's ideal weather and the
+             * actual weather, scale this depending on the crop's sensitivity
+             * to that weather, and calculate yield as a perfect score of 1
+             * minus deductions according to weather differences.
              */
-            double heatFactor = heat * crop.getHeatFactor();
-            double wetnessFactor = wetness * crop.getWetnessFactor();
-            double yield = 
-                    ((heatFactor + wetnessFactor) / 2);
+             
+            double heatDelta = Math.abs(heat - crop.getIdealHeat());
+            double wetnessDelta = Math.abs(wetness - crop.getIdealWetness());
             
-            profit += yield * field.getCropQuantity() * 
-                    crop.getSalePrice() * field.getSoilQuality();
+            double heatScore = heatDelta * crop.getHeatFactor();
+            double wetnessScore = wetnessDelta * crop.getWetnessFactor();
+            
+            double yield = 1 - heatScore - wetnessScore;
+            
+            profit += yield * field.getCropQuantity() * crop.getSalePrice() *
+            		field.getSoilQuality();
+            
         }
         
         return profit;
