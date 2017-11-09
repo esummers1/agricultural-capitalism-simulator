@@ -2,7 +2,7 @@
   {
   	"id": 0,
   	"name": "Wheat",
-  	"description": "Grass cultivated worldwide for its starchy cereal grains. Grows well in warm weather.",
+  	"description": "Grass cultivated worldwide for its starchy cereal grains. \nGrows well in warm weather.",
   	"cost": 5,
   	"salePrice": 7,
   	"wetnessFactor": 0.5,
@@ -24,7 +24,7 @@
   {
   	"id": 2,
   	"name": "Potato",
-  	"description": "Starchy tuber of the nightshade family prized for caloric content. Thrives in cool, wet weather.",
+  	"description": "Starchy tuber of the nightshade family prized for caloric \ncontent. Thrives in cool, wet weather.",
   	"cost": 8,
   	"salePrice": 14,
   	"wetnessFactor": 1.1,
@@ -57,7 +57,7 @@
   {
   	"id": 5,
   	"name": "Tomato",
-  	"description": "Juicy fruit of the nightshade family requiring warmth and plenty of sun.",
+  	"description": "Juicy fruit of the nightshade family requiring warmth and \nplenty of sun.",
   	"cost": 9,
   	"salePrice": 17,
   	"wetnessFactor": 0.5,
@@ -90,7 +90,7 @@
   {
   	"id": 8,
   	"name": "Grape",
-  	"description": "An expensive and tricky berry growing best in warm, dry climates. Potentially very valuable.",
+  	"description": "An expensive and tricky berry growing best in warm, dry \nclimates. Potentially very valuable.",
   	"cost": 18,
   	"salePrice": 45,
   	"wetnessFactor": 1.1,
@@ -101,7 +101,7 @@
   {
   	"id": 9,
   	"name": "Pumpkin",
-  	"description": "Squash plant prized for decoration. Prefers warm weather and some rain.",
+  	"description": "Squash plant prized for decoration. Prefers warm weather \nand some rain.",
   	"cost": 21,
   	"salePrice": 37,
   	"wetnessFactor": 1,

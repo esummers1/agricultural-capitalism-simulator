@@ -10,6 +10,7 @@ public class Field {
 	private int maxCropQuantity;
     private double soilQuality;
     private int price;
+    private int lastRevenue;
 	
 	public Field(
 			int fieldId,
@@ -61,6 +62,10 @@ public class Field {
 	public int getPrice() {
 		return price;
 	}
+	
+	public int getLastRevenue() {
+		return lastRevenue;
+	}
 
 	public boolean isEmpty() {
 	    return crop == null;
@@ -69,6 +74,10 @@ public class Field {
 	public void setCropQuantity(int cropQuantity) {
         this.cropQuantity = cropQuantity;
     }
+	
+	public void setLastRevenue(int lastRevenue) {
+		this.lastRevenue = lastRevenue;
+	}
 	
     public void clear() {
         crop = null;

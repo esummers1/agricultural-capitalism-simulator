@@ -298,7 +298,8 @@ public class Game {
         console.print("Available crops for planting:");
         
         for (int i = 0; i < crops.size(); i++) {
-            console.print((i + 1) + ") " + crops.get(i).getName());
+            console.print((i + 1) + ") " + crops.get(i).getName() + ", " + 
+            		crops.get(i).getCost() + " per unit");
         }
         
         console.newLine();
@@ -320,7 +321,8 @@ public class Game {
         console.newLine();
         console.print("How many units would you like to purchase (maximum " 
                 + maxVolume + ")?");
-
+        console.print("Enter 0 to exit to menu.");
+        
         int quantity = -1;
         while (quantity < 0 || quantity > maxVolume) {
             quantity = console.nextInt();
@@ -329,7 +331,6 @@ public class Game {
         console.newLine();
         
         if (quantity == 0) {
-        	console.waitForEnter();
             return;
         }
         
@@ -371,6 +372,8 @@ public class Game {
     	while (fieldChoice < 0 || fieldChoice > availableFields.size()) {
     		fieldChoice = console.nextInt() - 1;
     	}
+    	
+    	console.newLine();
 
         // If player has selected the return command, return to menu
         if (fieldChoice == availableFields.size()) {
@@ -381,7 +384,7 @@ public class Game {
     		console.print("Sorry, you have insufficient funds.");
     		return;
     	}
-    		
+    	
 		// Add to player's fields, mark it owned, deduct money
 		playerFields.add(availableFields.get(fieldChoice));
         int price = availableFields.get(fieldChoice).getPrice();
@@ -525,8 +528,12 @@ public class Game {
             
             double yield = 1 - heatScore - wetnessScore;
             
-            profit += yield * field.getCropQuantity() * crop.getSalePrice() *
-            		field.getSoilQuality();
+            int fieldRevenue = (int) (yield * field.getCropQuantity()
+            		* crop.getSalePrice() * field.getSoilQuality());
+            
+            field.setLastRevenue(fieldRevenue);
+            
+            profit += fieldRevenue;
             
         }
         
@@ -592,6 +599,30 @@ public class Game {
     }
     
     /**
+     * Report the performance of each field in turn 
+     */
+    private void reportFieldPerformance() {
+    	
+    	for (Field field : playerFields) {
+    		
+    		// Skip fields that had no crops planted
+    		if (field.isEmpty()) {
+    			continue;
+    		};
+    		
+    		int fieldExpense = field.getCrop().getCost() * 
+    				field.getCropQuantity();
+    		
+    		String fieldCrop = field.getCrop().getName();
+    		
+    		console.print(field.getName() + " - " + fieldCrop + ", Revenue " + 
+    				field.getLastRevenue() + ", Cost " + fieldExpense);
+    		
+    	}
+    	
+    }
+    
+    /**
      * Displays the results of the round and the current state of the game.
      * 
      * @param heat 
@@ -608,6 +639,8 @@ public class Game {
     	
     	console.print("Year " + (year - 1) + " performance:");
     	console.newLine();
+    	reportFieldPerformance();
+    	console.newLine();
     	console.print("Asset acquisitions: " + newAssets);
     	console.print("Revenue: " + profit);
     	console.print("Expenses: " + expenditure);
@@ -615,11 +648,13 @@ public class Game {
     	console.print("---------------------");
     	
         if (netProfit > 0) {
-            console.print("Congratulations! You made a net profit of " + netProfit + ".");
+            console.print("Congratulations! You made a net profit of " + 
+            		netProfit + ".");
         } else if (netProfit == 0) {
-            console.print("It could be worse; you broke even.");
+        	console.print("It could be worse; you broke even.");
         } else {
-            console.print("Commiserations! You made a loss of " + netProfit + ".");
+            console.print("Commiserations! You made a loss of " + netProfit + 
+            		".");
         }
         
         expenditure = 0;
@@ -629,6 +664,7 @@ public class Game {
         console.print("Total asset value: " + calculateAssets());
         console.sectionBreak();
         console.newLine();
+        console.waitForEnter();
                 
     }
     
@@ -638,6 +674,10 @@ public class Game {
     private void evaluateScore() {
     	
     	int score = money + calculateAssets();
+    	
+    	console.sectionBreak();
+    	console.sectionBreak();
+    	console.newLine();
     	console.print("Final score: " + score);
     	console.newLine();
     	console.print("Well played, capitalist! The rich get richer.");

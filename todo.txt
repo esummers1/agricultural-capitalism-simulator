@@ -2,9 +2,7 @@
 To Do
 ================================================================================
 
- - Report performance of fields in turn so you have insight
- - No way to cancel crop purchase
+ - Unit tests?
 
- - Press ENTER appears twice after entering junk input / buying 0 of a crop
-
- - Unit tests
+ - Develop representation of a strategy for playing the game
+  -- In order to teach the computer to play it programmatically
