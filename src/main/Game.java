@@ -107,11 +107,15 @@ public class Game {
     
     private boolean exiting;
     
-    private Console console = new Console();
-    private Random rand = new Random();
+    private Console console;
     
-    public Game() {
-
+    private Random rand;
+    private InputProvider inputProvider;
+    
+    public Game(long seed, InputProvider inputProvider, Console console) {
+        
+        this.console = console;
+        
         try {
             crops = readCropData(CROP_DATA_FILENAME);
             availableFields = readFieldData(FIELD_DATA_FILENAME);
@@ -120,6 +124,9 @@ public class Game {
                 FileNotFoundException e) {
             e.printStackTrace();
         }
+        
+        rand = new Random(seed);
+        this.inputProvider = inputProvider;
         
         // Give player initial field
         playerFields.add(availableFields.get(0));
@@ -202,7 +209,7 @@ public class Game {
      */
     private void finish() {
         console.print("Bye!");
-        console.close();
+        inputProvider.close();
     }
     
     /**
@@ -243,21 +250,14 @@ public class Game {
             }
             console.newLine();
             
-            int input = 0;
-            while (input < 1 || input > actions.size()) {
-            	input = console.nextInt();
-            }
-            
-            console.newLine();
-            
-            Action action = actions.get(input - 1);
+            Action action = inputProvider.getNextAction(actions);
             action.execute();
             
             if (action.shouldEndRound()) {
                 break;
             }
             
-            console.waitForEnter();
+            inputProvider.waitForEnter();
             console.sectionBreak();
             console.newLine();
         }
@@ -276,7 +276,6 @@ public class Game {
         if (emptyFields.size() == 0) {
         	console.print("Your fields are fully planted.");
         	console.newLine();
-        	console.waitForEnter();
         	return;
         } 
         
@@ -289,10 +288,7 @@ public class Game {
         console.newLine();
         console.print("Which field would you like to plant in?");
         
-        int fieldChoice = -1;
-        while (fieldChoice < 0 || fieldChoice >= emptyFields.size()) {
-            fieldChoice = console.nextInt() - 1;
-        }
+        Field field = inputProvider.getFieldToPlant(emptyFields);
         
         console.newLine();
         console.print("Available crops for planting:");
@@ -305,13 +301,7 @@ public class Game {
         console.newLine();
         console.print("Which crop would you like to plant?");
         
-        int cropChoice = -1;
-        while (cropChoice < 0 || cropChoice >= crops.size()) {
-            cropChoice = console.nextInt() - 1;
-        }
-        
-        Field field = emptyFields.get(fieldChoice);
-        Crop crop = crops.get(cropChoice);
+        Crop crop = inputProvider.getCropToPlant(field, money, crops);
         
         // Can't exceed field capacity or spend more money than we have
         int maxVolume = Math.min(
@@ -323,10 +313,7 @@ public class Game {
                 + maxVolume + ")?");
         console.print("Enter 0 to exit to menu.");
         
-        int quantity = -1;
-        while (quantity < 0 || quantity > maxVolume) {
-            quantity = console.nextInt();
-        }
+        int quantity = inputProvider.getCropQuantity(maxVolume);
         
         console.newLine();
         
@@ -368,27 +355,24 @@ public class Game {
     	console.print("Which field would you like to purchase? Enter " +
     			(availableFields.size() + 1) + " to return to menu.");
     	
-    	int fieldChoice = -1;
-    	while (fieldChoice < 0 || fieldChoice > availableFields.size()) {
-    		fieldChoice = console.nextInt() - 1;
-    	}
+    	Field field = inputProvider.getFieldToBuy(availableFields);
     	
     	console.newLine();
 
         // If player has selected the return command, return to menu
-        if (fieldChoice == availableFields.size()) {
+        if (field == null) {
             return;
         }
     	
-    	if (availableFields.get(fieldChoice).getPrice() > money) {
+    	if (field.getPrice() > money) {
     		console.print("Sorry, you have insufficient funds.");
     		return;
     	}
     	
 		// Add to player's fields, mark it owned, deduct money
-		playerFields.add(availableFields.get(fieldChoice));
-        int price = availableFields.get(fieldChoice).getPrice();
-		availableFields.remove(fieldChoice);
+		playerFields.add(field);
+        int price = field.getPrice();
+		availableFields.remove(field);
 		
 		money -= price;
 		expenditure += price;
@@ -664,7 +648,7 @@ public class Game {
         console.print("Total asset value: " + calculateAssets());
         console.sectionBreak();
         console.newLine();
-        console.waitForEnter();
+        inputProvider.waitForEnter();
                 
     }
     

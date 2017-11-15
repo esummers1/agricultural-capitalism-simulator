@@ -2,7 +2,6 @@
 To Do
 ================================================================================
 
- - Unit tests?
+ - Investigate building with Maven?
 
- - Develop representation of a strategy for playing the game
-  -- In order to teach the computer to play it programmatically
+ - Unit tests
