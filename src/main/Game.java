@@ -100,6 +100,11 @@ public class Game {
 	 */
 	private int year = 1;
 	
+	/**
+	 * The player's final score.
+	 */
+	private int score = 0;
+	
 	private List<Field> availableFields = new ArrayList<>();
     private List<Crop> crops = new ArrayList<>();
     
@@ -169,9 +174,9 @@ public class Game {
     }
     
     /**
-     * The game loop.
+     * The game loop. Returns the player's score.
      */
-    public void run() {
+    public int run() {
     	
         introduce();
         
@@ -202,6 +207,8 @@ public class Game {
         }
         
         finish();
+        return score;
+        
     }
     
     /**
