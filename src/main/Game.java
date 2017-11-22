@@ -243,7 +243,11 @@ public class Game {
             
             actions.add(new ListCropsAction(this));
             actions.add(new StatusAction(this));
-            actions.add(new BuyCropsAction(this));
+            
+            if (isEmptyFieldAvailable()) {
+                actions.add(new BuyCropsAction(this));
+            }
+            
             actions.add(new BuyFieldsAction(this));
             actions.add(new PlayAction(this));
             actions.add(new ExitAction(this));
@@ -268,6 +272,20 @@ public class Game {
             console.sectionBreak();
             console.newLine();
         }
+    }
+    
+    /**
+     * 
+     */
+    public boolean isEmptyFieldAvailable() {
+        
+        for (Field field : playerFields) {
+            if (field.isEmpty()) {
+                return true;                
+            }
+        }
+        
+        return false;
     }
     
     /**

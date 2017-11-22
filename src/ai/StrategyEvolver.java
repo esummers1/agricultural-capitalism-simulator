@@ -1,7 +1,9 @@
 package ai;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.OptionalDouble;
 
 import main.Console;
 import main.Game;
@@ -57,17 +59,28 @@ public class StrategyEvolver {
     }
 
     public void determineFitness(List<Strategy> currentGeneration) {
-        
-        // Each Solution plays the game with each seed
-        for (Strategy solution : currentGeneration) {
-            AiInputProvider inputProvider = new AiInputProvider(solution);
+
+        for (Strategy strategy : currentGeneration) {
+            
+            AiInputProvider inputProvider = new AiInputProvider(strategy);
+
+            // Play the game with each seed
+            List<Integer> scores = new ArrayList<>();
             for (Long seed : SEEDS) {
                 Game game = new Game(seed, inputProvider, console);
-                game.run();
+                int score = game.run();
+                scores.add(score);
             }
+
+            // Determine the average score for this Strategy
+            double avg = scores
+                    .stream()
+                    .mapToInt(Integer::intValue)
+                    .average()
+                    .getAsDouble();
+            
+            strategy.setFitness((int) avg);
         }
-        
-        // TODO: work out avg score?
     }
 
     private List<Strategy> breed(List<Strategy> currentGeneration) {
