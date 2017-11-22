@@ -2,6 +2,10 @@
 To Do
 ================================================================================
 
+ - Evolutionary Algorithm:
+    - Breeding
+    - Mutation
+
  - Investigate building with Maven?
 
  - Unit tests

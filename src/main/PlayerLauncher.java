@@ -3,7 +3,7 @@ package main;
 public class PlayerLauncher extends Launcher {
     
     public static void main(String[] args) {
-        PlayerLauncher playerLauncher = new PlayerLauncher();
+        new PlayerLauncher();
     }
     
     public PlayerLauncher() {

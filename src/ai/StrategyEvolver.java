@@ -2,8 +2,9 @@ package ai;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.OptionalDouble;
+import java.util.Map;
 
 import main.Console;
 import main.Crop;
@@ -29,7 +30,10 @@ public class StrategyEvolver {
     };
     
     private static final int NUM_GENERATIONS = 1;
+    
     private static final int POPULATION_SIZE = 10;
+
+    private static final double CHANCE_TO_MUTATE = 0.1;
     
     private List<Crop> crops;
     private List<Field> fields;
@@ -70,12 +74,15 @@ public class StrategyEvolver {
         
         for (int i = 0; i < POPULATION_SIZE; i++) {
             
-            int[] cropWeightings;
+            Map<Crop, Integer> cropWeightings = new HashMap<>();
             
-            // TODO: work out weightings and pass into strategy
-            Strategy strategy = new Strategy();
+            for (Crop crop : crops) {
+                // Generate a random initial weighting for each crop
+                int weighting = (int) (Math.random() * 100);
+                cropWeightings.put(crop, weighting);
+            }
             
-            
+            strategies.add(new Strategy(cropWeightings));
         }
         
         return strategies;        
@@ -107,13 +114,36 @@ public class StrategyEvolver {
         }
     }
 
-    private List<Strategy> breed(List<Strategy> currentGeneration) {
+    private List<Strategy> breed(List<Strategy> generation) {
+        /*
+         * TODO:
+         * 
+         * Loop until we have an entirely new generation:
+         * 
+         *   - Pick 2 parents using a selection function
+         *      ("fitter" parents more likely to be chosen)
+         *      
+         *   - "Breed" (somehow combine) parents to produce offspring
+         *      (e.g. choose half crop weightings from each parent)
+         */
         return null;
     }
 
-    private void mutate(List<Strategy> nextGeneration) {
-        // TODO Auto-generated method stub
+    private void mutate(List<Strategy> generation) {
         
+        for (Strategy strategy : generation) {
+            double r = Math.random();
+            if (r < CHANCE_TO_MUTATE) {
+
+                /*
+                 * TODO:
+                 * 
+                 * Randomly "mutate" this Strategy somehow,
+                 * e.g. change one of the weightings
+                 */
+                
+            }          
+        }
     }
 
 }

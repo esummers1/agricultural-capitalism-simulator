@@ -1,18 +1,9 @@
 package main;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonIOException;
-import com.google.gson.JsonSyntaxException;
-import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
 
 import actions.Action;
 import actions.BuyCropsAction;

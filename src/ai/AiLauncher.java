@@ -7,7 +7,7 @@ import main.Launcher;
 public class AiLauncher extends Launcher {
 
     public static void main(String[] args) {
-        AiLauncher aiLauncher = new AiLauncher();
+        new AiLauncher();
     }
     
     public AiLauncher() {
