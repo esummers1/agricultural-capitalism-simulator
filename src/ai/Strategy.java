@@ -8,10 +8,31 @@ import main.Crop;
 
 public class Strategy implements Comparable<Strategy> {
 
+    /**
+     * The likelihood to plant each Crop, expressed as an arbitrary weight.
+     */
     private Map<Crop, Integer> cropWeightings = new HashMap<>();
     
+    /**
+     * The likelihood to plant each Crop, expressed as a relative double.
+     * 
+     * These should add to 1.
+     */
     private Map<Crop, Double> chanceToPlant = new HashMap<>();
     
+    /**
+     * Creates a new Strategy using the given weightings.
+     * 
+     * @param cropWeightings
+     */
+    public Strategy(Map<Crop, Integer> cropWeightings) {
+        this.cropWeightings = cropWeightings;
+        recalculateChanceToPlant();
+    }
+    
+    /**
+     * Recalculates the chance to plant each crop based on the weightings.
+     */
     public void recalculateChanceToPlant() {
         
         int totalWeight = cropWeightings.values()
