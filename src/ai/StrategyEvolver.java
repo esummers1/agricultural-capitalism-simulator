@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.OptionalDouble;
 
 import main.Console;
+import main.Crop;
+import main.Field;
 import main.Game;
 
 /**
@@ -27,9 +29,18 @@ public class StrategyEvolver {
     };
     
     private static final int NUM_GENERATIONS = 1;
+    private static final int POPULATION_SIZE = 10;
+    
+    private List<Crop> crops;
+    private List<Field> fields;
 
     // Suppress output
     private Console console = new Console(null);
+
+    public StrategyEvolver(List<Crop> crops, List<Field> fields) {
+        this.crops = crops;
+        this.fields = fields;
+    }
 
     public List<Strategy> run() {
 
@@ -54,8 +65,20 @@ public class StrategyEvolver {
     }
 
     private List<Strategy> generateInitialPopulation() {
-        // TODO Auto-generated method stub
-        return null;
+        
+        List<Strategy> strategies = new ArrayList<>();
+        
+        for (int i = 0; i < POPULATION_SIZE; i++) {
+            
+            int[] cropWeightings;
+            
+            // TODO: work out weightings and pass into strategy
+            Strategy strategy = new Strategy();
+            
+            
+        }
+        
+        return strategies;        
     }
 
     public void determineFitness(List<Strategy> currentGeneration) {
@@ -67,7 +90,8 @@ public class StrategyEvolver {
             // Play the game with each seed
             List<Integer> scores = new ArrayList<>();
             for (Long seed : SEEDS) {
-                Game game = new Game(seed, inputProvider, console);
+                Game game = new Game(seed, inputProvider, console, crops, 
+                        fields);
                 int score = game.run();
                 scores.add(score);
             }

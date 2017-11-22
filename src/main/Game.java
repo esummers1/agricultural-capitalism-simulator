@@ -29,9 +29,6 @@ public class Game {
 	 */
 	private static final int END_GAME_YEAR = 20;
 	
-    private static final String CROP_DATA_FILENAME = "crops.dat";
-    private static final String FIELD_DATA_FILENAME = "fields.dat";
-    
     /*
      * Normally distributed about 1.0 +/- 0.1 with cutoffs at +/- 3 st devs.
      */
@@ -105,8 +102,8 @@ public class Game {
 	 */
 	private int score = 0;
 	
-	private List<Field> availableFields = new ArrayList<>();
-    private List<Crop> crops = new ArrayList<>();
+	private List<Field> availableFields;
+	private List<Crop> crops;
     
     private List<Field> playerFields = new ArrayList<>();
     
@@ -117,18 +114,12 @@ public class Game {
     private Random rand;
     private InputProvider inputProvider;
     
-    public Game(long seed, InputProvider inputProvider, Console console) {
+    public Game(long seed, InputProvider inputProvider, Console console, 
+            List<Crop> crops, List<Field> fields) {
         
         this.console = console;
-        
-        try {
-            crops = readCropData(CROP_DATA_FILENAME);
-            availableFields = readFieldData(FIELD_DATA_FILENAME);
-        } catch (JsonIOException |
-                JsonSyntaxException |
-                FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        this.crops = crops;
+        this.availableFields = new ArrayList<>(fields);
         
         rand = new Random(seed);
         this.inputProvider = inputProvider;
@@ -137,40 +128,6 @@ public class Game {
         playerFields.add(availableFields.get(0));
         availableFields.remove(0);
         
-    }
-    
-    /**
-     * Reads the crop data from the given file.
-     * 
-     * @param filename
-     * @return
-     * @throws JsonIOException
-     * @throws JsonSyntaxException
-     * @throws FileNotFoundException
-     */
-    private List<Crop> readCropData(String filename) 
-            throws JsonIOException, JsonSyntaxException, FileNotFoundException {
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<Crop>>(){}.getType();
-        return gson.fromJson(new JsonReader(
-                new FileReader(filename)), type);
-    }
-    
-    /**
-     * Reads the field data from the given file.
-     * 
-     * @param filename
-     * @return
-     * @throws JsonIOException
-     * @throws JsonSyntaxException
-     * @throws FileNotFoundException
-     */
-    private List<Field> readFieldData(String filename)
-    		throws JsonIOException, JsonSyntaxException, FileNotFoundException {
-    	Gson gson = new Gson();
-    	Type type = new TypeToken<List<Field>>(){}.getType();
-    	return gson.fromJson(new JsonReader(
-    			new FileReader(filename)), type);
     }
     
     /**

@@ -55,7 +55,7 @@ public class AiInputProvider implements InputProvider {
     public Crop getCropToPlant(Field field, int balance, List<Crop> crops) {
         
         double r = Math.random();
-        double chanceToPickThisCrop;
+        double chanceToPickThisCrop = 0;
         
         for (Crop crop : crops) {
             

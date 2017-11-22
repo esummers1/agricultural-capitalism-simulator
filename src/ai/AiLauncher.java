@@ -2,16 +2,23 @@ package ai;
 
 import java.util.List;
 
-public class AiLauncher {
+import main.Launcher;
+
+public class AiLauncher extends Launcher {
 
     public static void main(String[] args) {
-        StrategyEvolver algorithm = new StrategyEvolver();
+        AiLauncher aiLauncher = new AiLauncher();
+    }
+    
+    public AiLauncher() {
+        
+        StrategyEvolver algorithm = new StrategyEvolver(crops, fields);
         List<Strategy> strategies = algorithm.run();
         
         // Print best strategies found
         for (Strategy strategy : strategies) {
             System.out.println(strategy);
-        }
+        }   
     }
 
 }
