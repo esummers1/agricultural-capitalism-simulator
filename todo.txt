@@ -3,8 +3,7 @@ To Do
 ================================================================================
 
  - Evolutionary Algorithm:
-    - Breeding
-    - Mutation
+    - Selection of parents
 
  - Investigate building with Maven?
 

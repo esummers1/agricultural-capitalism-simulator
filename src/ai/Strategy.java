@@ -52,6 +52,10 @@ public class Strategy implements Comparable<Strategy> {
         return chanceToPlant.get(crop);
     }
     
+    public Map<Crop, Integer> getCropWeightings() {
+    	return cropWeightings;
+    }
+    
     @Override
     public int compareTo(Strategy o) {
         return fitness - o.fitness;
@@ -59,6 +63,10 @@ public class Strategy implements Comparable<Strategy> {
 
     public void setFitness(int fitness) {
         this.fitness = fitness;
+    }
+    
+    public void setCropWeightings(Map<Crop, Integer> cropWeightings) {
+    	this.cropWeightings = cropWeightings;
     }
 
 }

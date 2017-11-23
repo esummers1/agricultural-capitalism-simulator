@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import main.Console;
 import main.Crop;
@@ -29,11 +30,11 @@ public class StrategyEvolver {
             10000
     };
     
-    private static final int NUM_GENERATIONS = 1;
+    private static final int NUM_GENERATIONS = 10;
     
     private static final int POPULATION_SIZE = 10;
 
-    private static final double CHANCE_TO_MUTATE = 0.1;
+    private static final double CHANCE_TO_MUTATE = 0.2;
     
     private List<Crop> crops;
     private List<Field> fields;
@@ -68,6 +69,10 @@ public class StrategyEvolver {
         return currentGeneration;
     }
 
+    /**
+     * Randomly generate a population of Strategies.
+     * @return
+     */
     private List<Strategy> generateInitialPopulation() {
         
         List<Strategy> strategies = new ArrayList<>();
@@ -87,7 +92,12 @@ public class StrategyEvolver {
         
         return strategies;        
     }
-
+    
+    /**
+     * Determine the average fitness of each strategy across games played with
+     * all elements of SEEDS.
+     * @param currentGeneration
+     */
     public void determineFitness(List<Strategy> currentGeneration) {
 
         for (Strategy strategy : currentGeneration) {
@@ -113,35 +123,104 @@ public class StrategyEvolver {
             strategy.setFitness((int) avg);
         }
     }
-
+    
+    /**
+     * Combine members of a list of Strategies to produce a new list of the same
+     * size.
+     * @param generation
+     * @return
+     */
     private List<Strategy> breed(List<Strategy> generation) {
-        /*
-         * TODO:
-         * 
-         * Loop until we have an entirely new generation:
-         * 
-         *   - Pick 2 parents using a selection function
-         *      ("fitter" parents more likely to be chosen)
-         *      
-         *   - "Breed" (somehow combine) parents to produce offspring
-         *      (e.g. choose half crop weightings from each parent)
-         */
-        return null;
+    	
+    	List<Strategy> newGeneration = new ArrayList<>();
+    	
+    	while (newGeneration.size() < generation.size()) {
+    		
+    		Strategy father;
+    		Strategy mother;
+    		
+    		Map<Crop, Integer> childWeightings = new HashMap<>();
+    		
+    		// Acquire a list of two parent Strategies
+    		List<Strategy> parentStrategies = chooseParents(generation);
+    		
+    		// Randomize order of which one is which
+    		int r = (int) (Math.random() * 2);
+    		
+    		if (r == 0) {
+    			father = parentStrategies.get(0);
+    			mother = parentStrategies.get(1);
+    		} else {
+    			father = parentStrategies.get(1);
+    			mother = parentStrategies.get(0);
+    		}
+    		
+			// Take odd number ID crop weightings from 'father' strategy
+    		for (Entry<Crop, Integer> weighting : 
+    				father.getCropWeightings().entrySet()) {
+    			
+    			if (weighting.getKey().getId() % 2 != 0) {
+    				childWeightings.put(weighting.getKey(), 
+    						weighting.getValue());
+    			}
+    		}
+    		
+			// Take even number ID crop weightings from 'mother' strategy
+    		for (Entry<Crop, Integer> weighting : 
+    				mother.getCropWeightings().entrySet()) {
+    			
+    			if (weighting.getKey().getId() % 2 == 0) {
+    				childWeightings.put(weighting.getKey(), 
+    						weighting.getValue());
+    			}
+    		}
+    		
+    		Strategy child = new Strategy(childWeightings);
+    		newGeneration.add(child);
+    	}
+    	
+        return newGeneration;
     }
-
+    
+    /**
+     * Return a pair of parent Strategies from the list at random - with earlier
+     * (i.e. superior) elements being advantaged.
+     * @param generation
+     * @return
+     */
+    private List<Strategy> chooseParents(List<Strategy> generation) {
+    	
+    	List<Strategy> parents = new ArrayList<>();
+    	
+    	for (Strategy strategy : generation) {
+    		
+    		/*
+    		 * TODO: figure out how to select both in a weighted manner, e.g.
+    		 * use a geometric progression to ensure probabilities sum to 1
+    		 */
+    		
+    	}
+    	
+    	return parents;
+    }
+    
+    /**
+     * For each Strategy in passed generation, mutate some by re-generating the 
+     * weighting for a random crop in its map.
+     * @param generation
+     */
     private void mutate(List<Strategy> generation) {
         
         for (Strategy strategy : generation) {
-            double r = Math.random();
+            
+        	double r = Math.random();
             if (r < CHANCE_TO_MUTATE) {
 
-                /*
-                 * TODO:
-                 * 
-                 * Randomly "mutate" this Strategy somehow,
-                 * e.g. change one of the weightings
-                 */
-                
+            	int weightingToChange = (int) (Math.random() * crops.size());
+            	int newWeighting = (int) (Math.random() * 100);
+            	
+            	strategy.getCropWeightings()
+            			.put(crops.get(weightingToChange), newWeighting);
             }          
         }
     }
