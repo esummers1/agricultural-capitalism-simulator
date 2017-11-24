@@ -30,9 +30,9 @@ public class StrategyEvolver {
             10000
     };
     
-    private static final int NUM_GENERATIONS = 10;
+    private static final int NUM_GENERATIONS = 1000;
     
-    private static final int POPULATION_SIZE = 10;
+    private static final int POPULATION_SIZE = 2;
 
     private static final double CHANCE_TO_MUTATE = 0.2;
     
@@ -192,16 +192,69 @@ public class StrategyEvolver {
     	
     	List<Strategy> parents = new ArrayList<>();
     	
-    	for (Strategy strategy : generation) {
+    	double r;
+    	int counter;
+    	
+    	// Set probability of selecting first item as 2x the average probability
+    	double initialProbability = 2 / POPULATION_SIZE;
+    	
+    	// Set running probability total to be the initial, for first iteration
+    	double cumulativeProbability = initialProbability;
+    	
+    	// Get the common ratio for the geometric sequence so that it sums to 1
+    	double commonRatio = getCommonRatio((double) (POPULATION_SIZE), 
+    			initialProbability);
+    	
+    	while (parents.size() < 2) {
     		
-    		/*
-    		 * TODO: figure out how to select both in a weighted manner, e.g.
-    		 * use a geometric progression to ensure probabilities sum to 1
-    		 */
+    		// Set a new random value for each search
+    		r = Math.random();
+    		counter = 1;
     		
+    		for (Strategy strategy : generation) {
+        		
+        		if (r < cumulativeProbability) {
+        			parents.add(strategy);
+        			break;
+        		}
+        		
+        		/*
+        		 * Hard to explain - imagine listing the assigned probability of
+        		 * each element in the list, as they decline geometrically
+        		 * (according to the common ratio). This is how you sum all the
+        		 * probabilities up to the one just considered in a single call.
+        		 */
+        		cumulativeProbability = cumulativeProbability + 
+        				(initialProbability * Math.pow(commonRatio,  
+        				(counter - 1)));
+        		
+        		counter++;
+        	}
     	}
     	
     	return parents;
+    }
+    
+    /**
+     * Use an iterative technique to derive the common ratio required for a
+     * geometric sequence whose setSize terms sum to 1, i.e. a logarithmic
+     * probability distribution. This is to be used in chooseParents as a means
+     * of biasing high-performing strategies for selection.
+     * @param setSize
+     * @param initialProbability
+     * @return
+     */
+    private double getCommonRatio(double setSize, double initialProbability) {
+    	
+    	double thisR = initialProbability;
+    	double nextR = 0;
+    	
+    	while (nextR - thisR > 0.000001) {
+    		thisR = nextR;
+    		nextR = (setSize - 2 + 2 * Math.pow(setSize, thisR)) / setSize;
+    	}
+    	
+    	return nextR;    	
     }
     
     /**
