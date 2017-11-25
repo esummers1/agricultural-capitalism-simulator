@@ -30,11 +30,21 @@ public class StrategyEvolver {
             10000
     };
     
-    private static final int NUM_GENERATIONS = 20;
+    private static final int NUM_GENERATIONS = 100;
     
-    private static final int POPULATION_SIZE = 1000;
+    private static final int POPULATION_SIZE = 50;
 
     private static final double CHANCE_TO_MUTATE = 0.2;
+    
+    /**
+     * The initial weighting given to the best performer for the geometric
+     * series used to pick the fittest strategies.
+     * 
+     * A value of 1 means all are equally likely to be picked. Values above 2
+     * make it difficult for any of the lower performers to be picked, which can
+     * cause convergence on local maxima.
+     */
+    private static final double SCORE_BIAS = 1.2;
     
     private List<Crop> crops;
     private List<Field> fields;
@@ -196,7 +206,7 @@ public class StrategyEvolver {
     	int counter;
     	
     	// Set probability of selecting first item as 2x the average probability
-    	double initialProbability = 2 / (double) POPULATION_SIZE;
+    	double initialProbability = SCORE_BIAS / (double) POPULATION_SIZE;
     	
     	// Set running probability total to be the initial, for first iteration
     	double cumulativeProbability = initialProbability;
