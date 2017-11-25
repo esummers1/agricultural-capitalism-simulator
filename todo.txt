@@ -2,6 +2,11 @@
 To Do
 ================================================================================
 
+ - ** Evolutionary algorithm
+  - Improve strategy reporting readability?
+  - Incorporate field purchase into strategy
+  - Incorporate planting crops in multiple fields into strategy
+
  - Investigate building with Maven?
 
  - Unit tests

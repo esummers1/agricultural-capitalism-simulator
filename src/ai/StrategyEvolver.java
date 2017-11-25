@@ -30,9 +30,9 @@ public class StrategyEvolver {
             10000
     };
     
-    private static final int NUM_GENERATIONS = 100;
+    private static final int NUM_GENERATIONS = 10000;
     
-    private static final int POPULATION_SIZE = 50;
+    private static final int POPULATION_SIZE = 100;
 
     private static final double CHANCE_TO_MUTATE = 0.2;
     
