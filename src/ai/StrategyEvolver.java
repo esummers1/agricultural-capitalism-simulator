@@ -30,9 +30,9 @@ public class StrategyEvolver {
             10000
     };
     
-    private static final int NUM_GENERATIONS = 1000;
+    private static final int NUM_GENERATIONS = 20;
     
-    private static final int POPULATION_SIZE = 2;
+    private static final int POPULATION_SIZE = 1000;
 
     private static final double CHANCE_TO_MUTATE = 0.2;
     
@@ -196,7 +196,7 @@ public class StrategyEvolver {
     	int counter;
     	
     	// Set probability of selecting first item as 2x the average probability
-    	double initialProbability = 2 / POPULATION_SIZE;
+    	double initialProbability = 2 / (double) POPULATION_SIZE;
     	
     	// Set running probability total to be the initial, for first iteration
     	double cumulativeProbability = initialProbability;
@@ -246,15 +246,19 @@ public class StrategyEvolver {
      */
     private double getCommonRatio(double setSize, double initialProbability) {
     	
-    	double thisR = initialProbability;
-    	double nextR = 0;
-    	
-    	while (nextR - thisR > 0.000001) {
-    		thisR = nextR;
-    		nextR = (setSize - 2 + 2 * Math.pow(setSize, thisR)) / setSize;
-    	}
-    	
-    	return nextR;    	
+    	 double thisR = initialProbability;
+    	 double nextR = thisR;
+    	 
+    	 while (true) {
+    		 
+    		 nextR = ((setSize - 2) + 2 * (Math.pow(thisR, setSize))) / setSize;
+    		 
+    		 if (Math.abs(nextR - thisR) < 0.000001) {
+    			 return thisR;
+    		 } else {
+    			 thisR = nextR;
+    		 }
+    	 }
     }
     
     /**

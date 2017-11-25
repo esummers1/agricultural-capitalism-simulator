@@ -48,6 +48,30 @@ public class Strategy implements Comparable<Strategy> {
         }
     }
     
+    /**
+     * Print a list of the weightings used in this strategy, expressed as
+     * percentages of the total weighting.
+     */
+    public void printStrategy() {
+    	
+    	double totalWeighting = 0;
+    	
+    	for (Entry<Crop, Integer> cropWeighting : cropWeightings.entrySet()) {
+    		totalWeighting += cropWeighting.getValue();
+    	}
+    	
+    	for (Entry<Crop, Integer> cropWeighting : cropWeightings.entrySet()) {
+    		
+    		String thisCropName = cropWeighting.getKey().getName();
+    		double thisCropWeighting = (double) cropWeighting.getValue();
+    		
+    		int percentWeighting = (int) (thisCropWeighting / totalWeighting 
+    				* 100);
+    		
+    		System.out.printf(thisCropName + ": " + percentWeighting + "%%, ");
+    	}
+    }
+    
     public double getChanceToPlant(Crop crop) {
         return chanceToPlant.get(crop);
     }

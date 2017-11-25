@@ -2,12 +2,6 @@
 To Do
 ================================================================================
 
-** Evolutionary Algorithm
- - Need to report properties/performance of strategy, not its key
- - Currently the program hangs indefinitely with any population >2
-  -> Related to chooseParents? Is this looping forever?
-
-
  - Investigate building with Maven?
 
  - Unit tests
