@@ -11,17 +11,11 @@ public class AiLauncher extends Launcher {
     }
     
     public AiLauncher() {
-        
         StrategyEvolver algorithm = new StrategyEvolver(crops, fields);
         List<Strategy> strategies = algorithm.run();
         
-        // Print top 5 strategies found
-        for (int i = 1; i <= 5; i++) {
-        	strategies.get(i).printStrategy();
-        	System.out.println();
-        	System.out.println();
-        }
-        
+        System.out.println("Top solutions:");
+        StrategyEvolver.printTopStrategies(strategies, 5);
     }
 
 }

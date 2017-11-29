@@ -17,22 +17,11 @@ import main.Game;
  */
 public class StrategyEvolver {
 
-    private static final long[] SEEDS = new long[]{
-            1000,
-            2000,
-            3000,
-            4000,
-            5000,
-            6000,
-            7000,
-            8000,
-            9000,
-            10000
-    };
+    private static final int NUM_GAMES = 10;
     
-    private static final int NUM_GENERATIONS = 10000;
+    private static final int NUM_GENERATIONS = 200;
     
-    private static final int POPULATION_SIZE = 100;
+    private static final int POPULATION_SIZE = 200;
 
     private static final double CHANCE_TO_MUTATE = 0.2;
     
@@ -46,6 +35,8 @@ public class StrategyEvolver {
      */
     private static final double SCORE_BIAS = 1.2;
     
+    private static final int GENERATIONS_PER_SUMMARY = 10;
+    
     private List<Crop> crops;
     private List<Field> fields;
 
@@ -58,11 +49,19 @@ public class StrategyEvolver {
     }
 
     public List<Strategy> run() {
+        
+        System.out.println("Running...");
 
         List<Strategy> currentGeneration = generateInitialPopulation();
         
         // Iterate for a given number of generations
         for (int i = 0; i < NUM_GENERATIONS; i++) {
+            
+            if (i % GENERATIONS_PER_SUMMARY == 0) {
+                // Every nth generation
+                System.out.println("Generation " + i);
+                printTopStrategies(currentGeneration, 5);
+            }
             
             // Rate the current generation by fitness
             determineFitness(currentGeneration);
@@ -77,6 +76,13 @@ public class StrategyEvolver {
         // Sort and return the last generation
         Collections.sort(currentGeneration);
         return currentGeneration;
+    }
+
+    public static void printTopStrategies(List<Strategy> strategies, int num) {
+        // Print top strategies found
+        for (int i = 0; i < num; i++) {
+            System.out.println(strategies.get(i));
+        }
     }
 
     /**
@@ -116,7 +122,8 @@ public class StrategyEvolver {
 
             // Play the game with each seed
             List<Integer> scores = new ArrayList<>();
-            for (Long seed : SEEDS) {
+            for (int i = 0; i < NUM_GAMES; i++) {
+                long seed = (long) (Math.random() * Long.MAX_VALUE);
                 Game game = new Game(seed, inputProvider, console, crops, 
                         fields);
                 int score = game.run();
@@ -146,24 +153,21 @@ public class StrategyEvolver {
     	
     	while (newGeneration.size() < generation.size()) {
     		
-    		Strategy father;
-    		Strategy mother;
-    		
     		Map<Crop, Integer> childWeightings = new HashMap<>();
     		
+            // Set probability of selecting first item as 2x the average probability
+            double initialProbability = 
+                    SCORE_BIAS / (double) POPULATION_SIZE;
+            
+            // Get the common ratio for the geometric sequence so that it sums to 1
+            double commonRatio = getCommonRatio((double) (POPULATION_SIZE), 
+                    initialProbability);
+    		
     		// Acquire a list of two parent Strategies
-    		List<Strategy> parentStrategies = chooseParents(generation);
-    		
-    		// Randomize order of which one is which
-    		int r = (int) (Math.random() * 2);
-    		
-    		if (r == 0) {
-    			father = parentStrategies.get(0);
-    			mother = parentStrategies.get(1);
-    		} else {
-    			father = parentStrategies.get(1);
-    			mother = parentStrategies.get(0);
-    		}
+    		Strategy father = 
+    		        chooseParent(generation, initialProbability, commonRatio);
+    		Strategy mother = 
+    		        chooseParent(generation, initialProbability, commonRatio);
     		
 			// Take odd number ID crop weightings from 'father' strategy
     		for (Entry<Crop, Integer> weighting : 
@@ -196,53 +200,43 @@ public class StrategyEvolver {
      * Return a pair of parent Strategies from the list at random - with earlier
      * (i.e. superior) elements being advantaged.
      * @param generation
+     * @param initialProbability 
+     * @param commonRatio 
      * @return
      */
-    private List<Strategy> chooseParents(List<Strategy> generation) {
-    	
-    	List<Strategy> parents = new ArrayList<>();
+    private Strategy chooseParent(List<Strategy> generation, 
+            double initialProbability, double commonRatio) {
     	
     	double r;
     	int counter;
     	
-    	// Set probability of selecting first item as 2x the average probability
-    	double initialProbability = SCORE_BIAS / (double) POPULATION_SIZE;
-    	
     	// Set running probability total to be the initial, for first iteration
     	double cumulativeProbability = initialProbability;
-    	
-    	// Get the common ratio for the geometric sequence so that it sums to 1
-    	double commonRatio = getCommonRatio((double) (POPULATION_SIZE), 
-    			initialProbability);
-    	
-    	while (parents.size() < 2) {
+
+		// Set a new random value for each search
+		r = Math.random();
+		counter = 1;
+		
+		for (Strategy strategy : generation) {
     		
-    		// Set a new random value for each search
-    		r = Math.random();
-    		counter = 1;
+    		if (r < cumulativeProbability) {
+    			return strategy;
+    		}
     		
-    		for (Strategy strategy : generation) {
-        		
-        		if (r < cumulativeProbability) {
-        			parents.add(strategy);
-        			break;
-        		}
-        		
-        		/*
-        		 * Hard to explain - imagine listing the assigned probability of
-        		 * each element in the list, as they decline geometrically
-        		 * (according to the common ratio). This is how you sum all the
-        		 * probabilities up to the one just considered in a single call.
-        		 */
-        		cumulativeProbability = cumulativeProbability + 
-        				(initialProbability * Math.pow(commonRatio,  
-        				(counter - 1)));
-        		
-        		counter++;
-        	}
+    		/*
+    		 * Hard to explain - imagine listing the assigned probability of
+    		 * each element in the list, as they decline geometrically
+    		 * (according to the common ratio). This is how you sum all the
+    		 * probabilities up to the one just considered in a single call.
+    		 */
+    		cumulativeProbability = cumulativeProbability + 
+    				(initialProbability * Math.pow(commonRatio,  
+    				(counter - 1)));
+    		
+    		counter++;
     	}
-    	
-    	return parents;
+		
+		return generation.get(generation.size() - 1);
     }
     
     /**

@@ -4,9 +4,11 @@ import java.util.List;
 
 import actions.Action;
 import actions.BuyCropsAction;
+import actions.BuyFieldsAction;
 import actions.PlayAction;
 import main.Crop;
 import main.Field;
+import main.Game;
 import main.InputProvider;
 
 public class AiInputProvider implements InputProvider {
@@ -18,8 +20,20 @@ public class AiInputProvider implements InputProvider {
     }
     
     @Override
-    public Action getNextAction(List<Action> actions) {
-        
+    public Action getNextAction(List<Action> actions, Game game) {
+
+        // If field price is less than 1/2 of money - BUY IT!
+        for (Action action : actions) {
+            if (action instanceof BuyFieldsAction) {
+                for (Field field : game.getAvailableFields()) {
+                    if (field.getPrice() < game.getMoney() / 2) {
+                        System.out.println("buying field");
+                        return action;
+                    }
+                }
+            }
+        }
+            
         // If it's possible to buy crops, do that
         for (Action action : actions) {
             if (action instanceof BuyCropsAction) {

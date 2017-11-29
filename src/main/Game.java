@@ -95,6 +95,7 @@ public class Game {
 	
 	private List<Field> availableFields;
 	private List<Crop> crops;
+	private int lowestCropPrice;
     
     private List<Field> playerFields = new ArrayList<>();
     
@@ -119,6 +120,12 @@ public class Game {
         playerFields.add(availableFields.get(0));
         availableFields.remove(0);
         
+        lowestCropPrice = Integer.MAX_VALUE;
+        for (Crop crop : crops) {
+            if (crop.getCost() < lowestCropPrice) {
+                lowestCropPrice = crop.getCost();
+            }
+        }
     }
     
     /**
@@ -133,7 +140,7 @@ public class Game {
         	/**
         	 * End game if player has no remaining funds.
         	 */
-            if (money < 1) {
+            if (!canAffordCrops()) {
             	console.print("You are bankrupt. You will have to find a job.");
             	console.newLine();
             	break;
@@ -192,7 +199,7 @@ public class Game {
             actions.add(new ListCropsAction(this));
             actions.add(new StatusAction(this));
             
-            if (isEmptyFieldAvailable()) {
+            if (isEmptyFieldAvailable() && canAffordCrops()) {
                 actions.add(new BuyCropsAction(this));
             }
             
@@ -209,7 +216,7 @@ public class Game {
             }
             console.newLine();
             
-            Action action = inputProvider.getNextAction(actions);
+            Action action = inputProvider.getNextAction(actions, this);
             action.execute();
             
             if (action.shouldEndRound()) {
@@ -222,6 +229,10 @@ public class Game {
         }
     }
     
+    private boolean canAffordCrops() {
+        return money < lowestCropPrice;
+    }
+
     /**
      * 
      */
@@ -244,13 +255,6 @@ public class Game {
         List<Field> emptyFields = playerFields.stream()
                 .filter(f -> f.isEmpty())
                 .collect(Collectors.toList());
-        
-        // Return to menu if no fields have available space
-        if (emptyFields.size() == 0) {
-        	console.print("Your fields are fully planted.");
-        	console.newLine();
-        	return;
-        } 
         
         console.print("Your available fields:");
         
@@ -646,4 +650,12 @@ public class Game {
         exiting = true;
     }
 
+    public List<Field> getAvailableFields() {
+        return availableFields;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+    
 }

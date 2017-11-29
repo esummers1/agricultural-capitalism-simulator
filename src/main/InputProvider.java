@@ -6,7 +6,7 @@ import actions.Action;
 
 public interface InputProvider {
     
-    public Action getNextAction(List<Action> actions); 
+    public Action getNextAction(List<Action> actions, Game game); 
     
     public Field getFieldToPlant(List<Field> fields);
     

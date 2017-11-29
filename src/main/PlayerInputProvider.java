@@ -17,7 +17,7 @@ public class PlayerInputProvider implements InputProvider {
     }
     
     @Override
-    public Action getNextAction(List<Action> actions) {
+    public Action getNextAction(List<Action> actions, Game game) {
         
         int input = 0;
         while (input < 1 || input > actions.size()) {

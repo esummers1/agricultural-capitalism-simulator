@@ -1,6 +1,9 @@
 package ai;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -8,6 +11,29 @@ import main.Crop;
 
 public class Strategy implements Comparable<Strategy> {
 
+    private class CropChance implements Comparable<CropChance> {
+        
+        private Crop crop;
+        private double chance;
+        
+        public CropChance(Crop crop, double chance) {
+            this.crop = crop;
+            this.chance = chance;
+        }
+
+        @Override
+        public int compareTo(CropChance o) {
+            return Double.compare(o.chance, chance);
+        }
+        
+        @Override
+        public String toString() {
+            return crop.getName() + ": " + 
+                    String.valueOf((int) (chance * 100) + "%");
+        }
+        
+    }
+    
     private int fitness;
     
     /**
@@ -52,24 +78,24 @@ public class Strategy implements Comparable<Strategy> {
      * Print a list of the weightings used in this strategy, expressed as
      * percentages of the total weighting.
      */
-    public void printStrategy() {
-    	
-    	double totalWeighting = 0;
-    	
-    	for (Entry<Crop, Integer> cropWeighting : cropWeightings.entrySet()) {
-    		totalWeighting += cropWeighting.getValue();
-    	}
-    	
-    	for (Entry<Crop, Integer> cropWeighting : cropWeightings.entrySet()) {
-    		
-    		String thisCropName = cropWeighting.getKey().getName();
-    		double thisCropWeighting = (double) cropWeighting.getValue();
-    		
-    		int percentWeighting = (int) (thisCropWeighting / totalWeighting 
-    				* 100);
-    		
-    		System.out.printf(thisCropName + ": " + percentWeighting + "%%, ");
-    	}
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        
+        List<CropChance> cropChances = new ArrayList<>();
+        
+        for (Entry<Crop, Double> entry : chanceToPlant.entrySet()) {
+            cropChances.add(new CropChance(entry.getKey(), entry.getValue()));
+        }
+        
+        Collections.sort(cropChances);
+        
+        for (CropChance cropChance : cropChances) {
+            sb.append(cropChance.toString() + ", ");
+        }
+        
+    	return sb.toString();
     }
     
     public double getChanceToPlant(Crop crop) {
