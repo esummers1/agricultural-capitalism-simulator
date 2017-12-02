@@ -21,23 +21,22 @@ public class AiInputProvider implements InputProvider {
     
     @Override
     public Action getNextAction(List<Action> actions, Game game) {
-
+    	
         // If field price is less than 1/2 of money - BUY IT!
         for (Action action : actions) {
             if (action instanceof BuyFieldsAction) {
                 for (Field field : game.getAvailableFields()) {
                     if (field.getPrice() < game.getMoney() / 2) {
-                        System.out.println("buying field");
                         return action;
                     }
                 }
             }
         }
-            
+        
         // If it's possible to buy crops, do that
         for (Action action : actions) {
             if (action instanceof BuyCropsAction) {
-                return action;
+            	return action;
             }
         }
         
@@ -90,8 +89,7 @@ public class AiInputProvider implements InputProvider {
     }
 
     /**
-     * For now, return the first field in the list. At the moment this will not
-     * be used.
+     * For now, return the first field in the list.
      */
     @Override
     public Field getFieldToBuy(List<Field> fields) {

@@ -158,7 +158,6 @@ public class Game {
         		evaluateScore();
         		break;
         	}
-        	
         }
         
         finish();
@@ -230,7 +229,7 @@ public class Game {
     }
     
     private boolean canAffordCrops() {
-        return money < lowestCropPrice;
+        return money > lowestCropPrice;
     }
 
     /**
@@ -634,7 +633,7 @@ public class Game {
      */
     private void evaluateScore() {
     	
-    	int score = money + calculateAssets();
+    	score = money + calculateAssets();
     	
     	console.sectionBreak();
     	console.sectionBreak();

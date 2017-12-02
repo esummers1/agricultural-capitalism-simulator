@@ -3,9 +3,11 @@ To Do
 ================================================================================
 
  - ** Evolutionary algorithm
-  - Improve strategy reporting readability?
-  - Incorporate field purchase into strategy
-  - Incorporate planting crops in multiple fields into strategy
+  - Add element of strategy to when to purchase fields
+  - Is it possible to have a strategy with an understanding of grouping crops,
+    e.g. pairing cold and warm weather crops in each round to hedge bets?
+
+ - ISSUE: algorithm sometimes hangs when processing a generation, unknown cause
 
  - Investigate building with Maven?
 

@@ -80,8 +80,11 @@ public class Strategy implements Comparable<Strategy> {
      */
     @Override
     public String toString() {
-
+    	
         StringBuilder sb = new StringBuilder();
+        
+        // Report average score in final generation for this strategy
+        sb.append("SCORE: " + fitness + ". ");
         
         List<CropChance> cropChances = new ArrayList<>();
         
@@ -106,9 +109,13 @@ public class Strategy implements Comparable<Strategy> {
     	return cropWeightings;
     }
     
+    public int getFitness() {
+    	return fitness;
+    }
+    
     @Override
     public int compareTo(Strategy o) {
-        return fitness - o.fitness;
+    	return Integer.compare(o.fitness, fitness);
     }
 
     public void setFitness(int fitness) {

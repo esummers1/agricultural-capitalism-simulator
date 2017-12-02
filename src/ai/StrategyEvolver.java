@@ -17,25 +17,26 @@ import main.Game;
  */
 public class StrategyEvolver {
 
-    private static final int NUM_GAMES = 10;
+    private static final int NUM_GAMES = 20;
     
-    private static final int NUM_GENERATIONS = 200;
+    private static final int NUM_GENERATIONS = 500;
     
-    private static final int POPULATION_SIZE = 200;
+    private static final int POPULATION_SIZE = 80;
 
     private static final double CHANCE_TO_MUTATE = 0.2;
     
-    /**
+    /*
      * The initial weighting given to the best performer for the geometric
      * series used to pick the fittest strategies.
      * 
-     * A value of 1 means all are equally likely to be picked. Values above 2
-     * make it difficult for any of the lower performers to be picked, which can
-     * cause convergence on local maxima.
+     * A value of 1 means all are equally likely to be picked.
      */
-    private static final double SCORE_BIAS = 1.2;
+    private static final double SCORE_BIAS = 2;
     
-    private static final int GENERATIONS_PER_SUMMARY = 10;
+    /*
+     * How many generations to play between progress reports.
+     */
+    private static final int GENERATIONS_PER_SUMMARY = 5;
     
     private List<Crop> crops;
     private List<Field> fields;
@@ -57,32 +58,51 @@ public class StrategyEvolver {
         // Iterate for a given number of generations
         for (int i = 0; i < NUM_GENERATIONS; i++) {
             
-            if (i % GENERATIONS_PER_SUMMARY == 0) {
-                // Every nth generation
-                System.out.println("Generation " + i);
-                printTopStrategies(currentGeneration, 5);
-            }
-            
             // Rate the current generation by fitness
             determineFitness(currentGeneration);
             Collections.sort(currentGeneration);
             
-            // Create the next generation
-            List<Strategy> nextGeneration = breed(currentGeneration);
-            mutate(nextGeneration);
-            currentGeneration = nextGeneration;
+            // Find average fitness (score) across whole generation
+            int totalFitness = 0;
+            
+            for (Strategy strategy : currentGeneration) {
+            	totalFitness += strategy.getFitness();
+            }
+            
+            int averageFitness = (int) 
+            		((double) totalFitness / (double) currentGeneration.size());
+            
+            // Give a progress report if we are on a reported generation
+            if (i % GENERATIONS_PER_SUMMARY == 0) {
+                System.out.println("Generation " + i + " - Average score: " + 
+                		averageFitness);
+                printTopStrategies(currentGeneration, 5);
+            }
+            
+            if (NUM_GENERATIONS - i != 1) {
+	            // Create the next generation
+	            List<Strategy> nextGeneration = breed(currentGeneration);
+	            mutate(nextGeneration);
+	            currentGeneration = nextGeneration;
+            }
         }
 
-        // Sort and return the last generation
+        // Return the last generation
         Collections.sort(currentGeneration);
         return currentGeneration;
     }
-
+    
+    /**
+     * Print top strategies found.
+     * @param strategies
+     * @param num
+     */
     public static void printTopStrategies(List<Strategy> strategies, int num) {
-        // Print top strategies found
         for (int i = 0; i < num; i++) {
             System.out.println(strategies.get(i));
         }
+        
+        System.out.println();
     }
 
     /**
@@ -155,15 +175,16 @@ public class StrategyEvolver {
     		
     		Map<Crop, Integer> childWeightings = new HashMap<>();
     		
-            // Set probability of selecting first item as 2x the average probability
+            // Set probability of selecting first item using score bias
             double initialProbability = 
                     SCORE_BIAS / (double) POPULATION_SIZE;
             
-            // Get the common ratio for the geometric sequence so that it sums to 1
+            // Get the common ratio for the geometric sequence so that it sums 
+            // to 1
             double commonRatio = getCommonRatio((double) (POPULATION_SIZE), 
                     initialProbability);
     		
-    		// Acquire a list of two parent Strategies
+    		// Select parent strategies
     		Strategy father = 
     		        chooseParent(generation, initialProbability, commonRatio);
     		Strategy mother = 
@@ -197,8 +218,8 @@ public class StrategyEvolver {
     }
     
     /**
-     * Return a pair of parent Strategies from the list at random - with earlier
-     * (i.e. superior) elements being advantaged.
+     * Return a parent Strategy from the list at random - with earlier (i.e. 
+     * superior) elements being advantaged.
      * @param generation
      * @param initialProbability 
      * @param commonRatio 
