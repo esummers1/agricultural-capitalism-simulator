@@ -268,16 +268,23 @@ public class Game {
         
         console.newLine();
         console.print("Available crops for planting:");
+
+        List<Crop> affordableCrops = crops
+                .stream()
+                .filter(c -> (c.getCost() <= money))
+                .collect(Collectors.toList());
         
-        for (int i = 0; i < crops.size(); i++) {
-            console.print((i + 1) + ") " + crops.get(i).getName() + ", " + 
-            		crops.get(i).getCost() + " per unit");
+        for (int i = 0; i < affordableCrops.size(); i++) {
+            console.print(
+                    (i + 1) + ") " + 
+                    affordableCrops.get(i).getName() + ", " + 
+                    affordableCrops.get(i).getCost() + " per unit");
         }
         
         console.newLine();
         console.print("Which crop would you like to plant?");
         
-        Crop crop = inputProvider.getCropToPlant(field, money, crops);
+        Crop crop = inputProvider.getCropToPlant(field, money, affordableCrops);
         
         // Can't exceed field capacity or spend more money than we have
         int maxVolume = Math.min(

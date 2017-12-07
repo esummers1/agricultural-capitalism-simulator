@@ -19,9 +19,9 @@ public class StrategyEvolver {
 
     private static final int NUM_GAMES = 20;
     
-    private static final int NUM_GENERATIONS = 500;
+    private static final int NUM_GENERATIONS = 1000;
     
-    private static final int POPULATION_SIZE = 80;
+    private static final int POPULATION_SIZE = 100;
 
     private static final double CHANCE_TO_MUTATE = 0.2;
     
@@ -36,7 +36,7 @@ public class StrategyEvolver {
     /*
      * How many generations to play between progress reports.
      */
-    private static final int GENERATIONS_PER_SUMMARY = 5;
+    private static final int GENERATIONS_PER_SUMMARY = 20;
     
     private List<Crop> crops;
     private List<Field> fields;
