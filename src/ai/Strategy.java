@@ -48,13 +48,18 @@ public class Strategy implements Comparable<Strategy> {
      */
     private Map<Crop, Double> chanceToPlant = new HashMap<>();
     
+    // Represents the ratio of funds to field cost that must be had before
+    // purchasing it.
+    private double fieldRatio;
+    
     /**
      * Creates a new Strategy using the given weightings.
      * 
      * @param cropWeightings
      */
-    public Strategy(Map<Crop, Integer> cropWeightings) {
+    public Strategy(Map<Crop, Integer> cropWeightings, double fieldRatio) {
         this.cropWeightings = cropWeightings;
+        this.fieldRatio = fieldRatio;
         recalculateChanceToPlant();
     }
     
@@ -84,7 +89,8 @@ public class Strategy implements Comparable<Strategy> {
         StringBuilder sb = new StringBuilder();
         
         // Report average score in final generation for this strategy
-        sb.append("SCORE: " + fitness + ". ");
+        sb.append("SCORE: " + fitness + ". " + "Field ratio: " + fieldRatio +
+        		". ");
         
         List<CropChance> cropChances = new ArrayList<>();
         
@@ -113,6 +119,10 @@ public class Strategy implements Comparable<Strategy> {
     	return fitness;
     }
     
+    public double getFieldRatio() {
+    	return fieldRatio;
+    }
+    
     @Override
     public int compareTo(Strategy o) {
     	return Integer.compare(o.fitness, fitness);
@@ -120,6 +130,10 @@ public class Strategy implements Comparable<Strategy> {
 
     public void setFitness(int fitness) {
         this.fitness = fitness;
+    }
+    
+    public void setFieldRatio(double fieldRatio) {
+    	this.fieldRatio = fieldRatio;
     }
     
     public void setCropWeightings(Map<Crop, Integer> cropWeightings) {

@@ -26,7 +26,8 @@ public class AiInputProvider implements InputProvider {
         for (Action action : actions) {
             if (action instanceof BuyFieldsAction) {
                 for (Field field : game.getAvailableFields()) {
-                    if (field.getPrice() < game.getMoney() / 2) {
+                    if (field.getPrice() < 
+                    		game.getMoney() / strategy.getFieldRatio()) {
                         return action;
                     }
                 }

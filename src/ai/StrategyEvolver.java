@@ -17,26 +17,23 @@ import main.Game;
  */
 public class StrategyEvolver {
 
-    private static final int NUM_GAMES = 20;
-    
+    private static final int NUM_GAMES = 25;
     private static final int NUM_GENERATIONS = 1000;
-    
     private static final int POPULATION_SIZE = 100;
 
-    private static final double CHANCE_TO_MUTATE = 0.2;
+    private static final double CHANCE_TO_MUTATE_CROP = 0.25;
+    private static final double CHANCE_TO_MUTATE_FIELD = 0.125;
+    private static final double FIELD_MUTATION_SIZE = 0.2;
     
     /*
      * The initial weighting given to the best performer for the geometric
-     * series used to pick the fittest strategies.
-     * 
-     * A value of 1 means all are equally likely to be picked.
+     * series used to pick the fittest strategies. A value of 1 means all are 
+     * equally likely to be picked.
      */
     private static final double SCORE_BIAS = 2;
     
-    /*
-     * How many generations to play between progress reports.
-     */
-    private static final int GENERATIONS_PER_SUMMARY = 20;
+    // How many generations to play between progress reports.
+    private static final int GENERATIONS_PER_SUMMARY = 10;
     
     private List<Crop> crops;
     private List<Field> fields;
@@ -123,7 +120,10 @@ public class StrategyEvolver {
                 cropWeightings.put(crop, weighting);
             }
             
-            strategies.add(new Strategy(cropWeightings));
+            // Generate initial field purchase weighting
+            double fieldRatio = Math.random() * 2 + 1;
+            
+            strategies.add(new Strategy(cropWeightings, fieldRatio));
         }
         
         return strategies;        
@@ -210,7 +210,10 @@ public class StrategyEvolver {
     			}
     		}
     		
-    		Strategy child = new Strategy(childWeightings);
+    		// Take field purchase weighting from father strategy
+    		double fieldRatio = father.getFieldRatio();
+    		
+    		Strategy child = new Strategy(childWeightings, fieldRatio);
     		newGeneration.add(child);
     	}
     	
@@ -296,14 +299,21 @@ public class StrategyEvolver {
         for (Strategy strategy : generation) {
             
         	double r = Math.random();
-            if (r < CHANCE_TO_MUTATE) {
+            if (r < CHANCE_TO_MUTATE_CROP) {
 
             	int weightingToChange = (int) (Math.random() * crops.size());
             	int newWeighting = (int) (Math.random() * 100);
             	
             	strategy.getCropWeightings()
             			.put(crops.get(weightingToChange), newWeighting);
-            }          
+            }
+            
+            if (r < CHANCE_TO_MUTATE_FIELD) {
+            	strategy.setFieldRatio(
+            			strategy.getFieldRatio() + 
+            			(Math.random() * FIELD_MUTATION_SIZE - 
+            			FIELD_MUTATION_SIZE / 2));
+            }
         }
     }
 
