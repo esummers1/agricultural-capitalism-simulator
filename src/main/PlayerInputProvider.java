@@ -27,7 +27,6 @@ public class PlayerInputProvider implements InputProvider {
         console.newLine();
         
         return actions.get(input - 1);
-        
     }
     
     private int nextInt() {

@@ -202,7 +202,10 @@ public class Game {
                 actions.add(new BuyCropsAction(this));
             }
             
-            actions.add(new BuyFieldsAction(this));
+            if (availableFields.size() != 0) {
+            	actions.add(new BuyFieldsAction(this));
+            }
+            
             actions.add(new PlayAction(this));
             actions.add(new ExitAction(this));
             
@@ -317,12 +320,6 @@ public class Game {
      * Allow player to buy new fields
      */
     public void buyFields() {
-    	
-    	// If there are no fields available, return player to menu
-    	if (availableFields.size() == 0) {
-    		console.print("There are no fields remaining for purchase!");
-    		return;
-    	}
     	
     	console.print("Here are the fields available for purchase:");
     	console.newLine();

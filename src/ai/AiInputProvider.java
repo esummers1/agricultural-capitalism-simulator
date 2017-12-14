@@ -22,7 +22,7 @@ public class AiInputProvider implements InputProvider {
     @Override
     public Action getNextAction(List<Action> actions, Game game) {
     	
-        // If field price is less than 1/2 of money - BUY IT!
+        // If AI has sufficient funds (according to strategy), buy field
         for (Action action : actions) {
             if (action instanceof BuyFieldsAction) {
                 for (Field field : game.getAvailableFields()) {
