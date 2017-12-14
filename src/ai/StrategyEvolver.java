@@ -210,8 +210,9 @@ public class StrategyEvolver {
     			}
     		}
     		
-    		// Take field purchase weighting from father strategy
-    		double fieldRatio = father.getFieldRatio();
+    		// Take field purchase weighting from both strategies
+    		double fieldRatio = 0.5 * (father.getFieldRatio() +	
+    				mother.getFieldRatio());
     		
     		Strategy child = new Strategy(childWeightings, fieldRatio);
     		newGeneration.add(child);
